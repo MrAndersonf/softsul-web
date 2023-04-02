@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 
-import { useRouter } from 'next/router';
 import { Lock } from '@material-ui/icons';
-import { Checkbox, InputAdornment } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { Checkbox, InputAdornment } from '@mui/material';
 import { AccountCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 import {
 	ButtonTitle,
@@ -21,7 +20,9 @@ import {
 	Title,
 	TitleKeep,
 } from '../styles/Login/style';
+const Logo = require('../assets/logo.png');
 import { NextPage } from 'next';
+import Image from 'next/image';
 
 const Login: NextPage = () => {
 	const schema = yup.object().shape({
@@ -75,8 +76,7 @@ const Login: NextPage = () => {
 		<Container>
 			<Form onSubmit={formik.handleSubmit}>
 				<Company>
-					<Centro>Centro</Centro>
-					<Pool>Pool</Pool>
+					<Image src={Logo} alt="Logo" width={160} height={120} />
 				</Company>
 
 				<TextField

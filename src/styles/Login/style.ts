@@ -14,17 +14,14 @@ export const Container = styled.div`
 export const Company = styled.div`
 	display: flex;
 	width: 330px;
-	height: 30px;
 	flex-direction: row;
 	justify-content: center;
-	align-items: center;
-	padding-bottom: 20px;
+	align-items: center; ;
 `;
 
 export const Form = styled.form`
 	display: flex;
 	width: 330px;
-	height: 60%;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
