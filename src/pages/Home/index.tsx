@@ -1,4 +1,4 @@
-import { SideMenu } from 'components/SideMenu';
+import { SideMenu } from '../../components/SideMenu';
 import { NextPage } from 'next';
 import React from 'react';
 
@@ -7,4 +7,4 @@ export const Home: NextPage = () => {
 };
 
 export default Home;
-3
+3;
