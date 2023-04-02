@@ -22,11 +22,12 @@
 		],
 		"baseUrl": "./src",
 		"paths": {
-			"components/*": ["./src/components/*"],
-			"context/*": ["./src/context/*"],
-			"utils/*": ["./src/utils/*"],
-			"interfaces/*": ["./src/interfaces/*"],
-			"icons/*": ["./src/icons/*"]
+			"@/utils/*": ["/utils/*"],
+			"@/icons/*": ["/icons/*"],
+			"@/enums/*": ["/enums/*"],
+			"@/context/*": ["/context/*"],
+			"@/interfaces/*": ["/interfaces/*"],
+			"@/components/*": ["/components/*"]
 		}
 	},
 	"include": [

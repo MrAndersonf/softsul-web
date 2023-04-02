@@ -4,10 +4,11 @@ import React from 'react';
 
 import axios from 'axios';
 
-import Snack from '../components/Snack';
+import Snack from 'components/Snack';
 
 import jsPDF from 'jspdf';
 import { ICurrency } from 'interfaces';
+import { EOrder } from 'enums';
 
 export function toDollar(price: string) {
 	const value = Number(price.replace(',', '.'));
@@ -16,6 +17,18 @@ export function toDollar(price: string) {
 		currency: 'USD',
 	});
 	return dollar;
+}
+
+export function getComparator<Key extends keyof any>(
+	order: EOrder,
+	orderBy: Key,
+): (
+	a: { [key in Key]: number | string | string[] },
+	b: { [key in Key]: number | string | string[] },
+) => number {
+	return order === 'desc'
+		? (a, b) => descendingComparator(a, b, orderBy)
+		: (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 export const monetaryValue = (

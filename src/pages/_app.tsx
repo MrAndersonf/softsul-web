@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import '../styles/Home.module.css';
 import type { AppProps } from 'next/app';
 import { AlertDialog } from 'mui-react-alert';
 import { Collapse } from '@mui/material';

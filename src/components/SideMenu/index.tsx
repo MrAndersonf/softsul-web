@@ -9,6 +9,7 @@ import {
 	GrassIcon,
 	EventIcon,
 	ScaleIcon,
+	BranchIcon,
 } from '../../icons';
 import List from '@mui/material/List';
 import Box from '@mui/material/Box';
@@ -201,14 +202,14 @@ export const SideMenu = () => {
 						dense
 						disablePadding
 						button
-						key={'dash'}
-						onClick={() => handleNavigate('/Dash')}
+						key={'home'}
+						onClick={() => handleNavigate('/Home')}
 					>
 						<ListItemButton>
 							<ListItemIcon>
 								<HomeIcon />
 							</ListItemIcon>
-							<ListItemText primary={'Dash'} />
+							<ListItemText primary={'Home'} />
 						</ListItemButton>
 					</ListItem>
 
@@ -216,29 +217,14 @@ export const SideMenu = () => {
 						dense
 						disablePadding
 						button
-						key={'newOrder'}
-						onClick={() => handleNavigate('/NovoPedido')}
-					>
-						<ListItemButton>
-							<ListItemIcon>
-								<HomeIcon />
-							</ListItemIcon>
-							<ListItemText primary={'Novo Pedido'} />
-						</ListItemButton>
-					</ListItem>
-
-					<ListItem
-						dense
-						disablePadding
-						button
-						key={'farmer'}
-						onClick={() => handleNavigate('/Produtores')}
+						key={'user'}
+						onClick={() => handleNavigate('/user')}
 					>
 						<ListItemButton>
 							<ListItemIcon>
 								<Hail />
 							</ListItemIcon>
-							<ListItemText primary={'Produtores'} />
+							<ListItemText primary={'Usuários'} />
 						</ListItemButton>
 					</ListItem>
 
@@ -246,51 +232,16 @@ export const SideMenu = () => {
 						dense
 						disablePadding
 						button
-						key={'crops'}
-						onClick={() => handleNavigate('/Culturas')}
+						key={'Branch'}
+						onClick={() => handleNavigate('/Branch')}
 					>
 						<ListItemButton>
 							<ListItemIcon>
-								<GrassIcon />
+								<BranchIcon />
 							</ListItemIcon>
-							<ListItemText primary={'Culturas'} />
+							<ListItemText primary={'Filiais'} />
 						</ListItemButton>
 					</ListItem>
-
-					<ListItem
-						dense
-						disablePadding
-						button
-						key={'units'}
-						onClick={() => handleNavigate('/Unidades')}
-					>
-						<ListItemButton>
-							<ListItemIcon>
-								<ScaleIcon />
-							</ListItemIcon>
-							<ListItemText primary={'Unidades'} />
-						</ListItemButton>
-					</ListItem>
-
-					{/* {(access?.role === 'Desenvolvedor' ||
-						access?.role === 'Centropool' ||
-						access?.role === 'Diretor' ||
-						access?.role === 'Proprietário') && ( */}
-					<ListItem
-						dense
-						disablePadding
-						button
-						key={'access'}
-						onClick={() => handleNavigate('/CadastrarAcesso')}
-					>
-						<ListItemButton>
-							<ListItemIcon>
-								<Access />
-							</ListItemIcon>
-							<ListItemText primary={'Acesso'} />
-						</ListItemButton>
-					</ListItem>
-					{/* )} */}
 				</List>
 				<Divider />
 			</Drawer>

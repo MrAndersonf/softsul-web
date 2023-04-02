@@ -4,7 +4,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 
 import CloseIcon from '@mui/icons-material/Close';
-
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import SaveIcon from '@mui/icons-material/Save';
 import Search from '@mui/icons-material/Search';
 import HailIcon from '@mui/icons-material/Hail';
@@ -171,4 +171,10 @@ export const WarehouseIcon = ({ color, size }: IICons) => {
 };
 export const AgricultureIcon = ({ color, size }: IICons) => {
 	return <Agriculture sx={{ fontSize: size || 22, color: color || null }} />;
+};
+
+export const BranchIcon = ({ color, size }: IICons) => {
+	return (
+		<AddBusinessIcon sx={{ fontSize: size || 22, color: color || null }} />
+	);
 };

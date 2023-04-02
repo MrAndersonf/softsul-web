@@ -14,11 +14,21 @@ export interface IUser {
 export interface IBranch {
 	id: string;
 	name: string;
-	city: string;
 	cnpj: string;
 	address: IAddress;
 	email: string;
 	coordinates?: { lat: string; long: string };
+}
+
+export interface IBranchShow {
+	id: string;
+	position: number;
+	name: string;
+	cnpj: string;
+	city: string;
+	state: string;
+	lat: string;
+	long: string;
 }
 
 export interface IAddress {
