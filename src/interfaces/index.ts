@@ -18,6 +18,7 @@ export interface IBranch {
 	address: IAddress;
 	email: string;
 	coordinates?: { lat: string; long: string };
+	active: boolean;
 }
 
 export interface IBranchShow {
@@ -29,9 +30,11 @@ export interface IBranchShow {
 	state: string;
 	lat: string;
 	long: string;
+	active: string;
 }
 
 export interface IAddress {
+	zipcode: string;
 	street: string;
 	number: string;
 	reference: string;

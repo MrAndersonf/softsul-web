@@ -287,33 +287,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.name}
 									/>
 								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={12} xl={6}>
-									<TextInput
-										name="fantasy"
-										value={formik.values.fantasy}
-										title="Nome Fantasia"
-										onChange={handleChange}
-										error={formik.errors.fantasy}
-									/>
-								</Grid>
-								<Grid item xs={6} sm={6} md={6} lg={3} xl={2}>
-									<TextInput
-										name="type"
-										value={formik.values.type}
-										title="Tipo"
-										onChange={handleChange}
-										error={formik.errors.type}
-									/>
-								</Grid>
-								<Grid item xs={6} sm={6} md={6} lg={3} xl={2}>
-									<TextInput
-										name="status"
-										value={formik.values.status}
-										title="Status"
-										onChange={handleChange}
-										error={formik.errors.status}
-									/>
-								</Grid>
+
 								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
 									<TextInput
 										name="street"
@@ -385,15 +359,6 @@ const Branch: NextPage = () => {
 									/>
 								</Grid>
 
-								<Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-									<TextInput
-										name="phone"
-										value={formik.values.phone}
-										title="Telefone"
-										onChange={handleChange}
-										error={formik.errors.phone}
-									/>
-								</Grid>
 								<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
 									<FormControlLabel
 										control={

@@ -37,10 +37,10 @@ import {
 	retrieveCitiesByState,
 	truncate,
 } from 'utils';
-import { Add, NewDocument } from 'icons';
+import { Add, Close, NewDocument } from 'icons';
 import { useCustomContext } from 'context';
 import { useRouter } from 'next/router';
-import { BranchsTable } from 'components/TableSupplier';
+import { BranchsTable } from 'components/BranchsTable';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -77,6 +77,8 @@ const Branch: NextPage = () => {
 		city: yup.string().required('Campo obrigatório'),
 		state: yup.string().required('Campo obrigatório'),
 		phone: yup.string().required('Campo obrigatório'),
+		lat: yup.string().required('Campo obrigatório'),
+		long: yup.string().required('Campo obrigatório'),
 
 		cnpj: yup
 			.string()
@@ -105,6 +107,8 @@ const Branch: NextPage = () => {
 			state: '',
 			phone: '',
 			active: true,
+			lat: '',
+			long: '',
 		},
 		onSubmit: async (values, { resetForm }) => {
 			// const newSupplier = new Supplier(values);
@@ -123,28 +127,24 @@ const Branch: NextPage = () => {
 		},
 	});
 
-	const edit = async (id: string) => {
+	const handleBranchsTableOnEdit = async (id: string) => {
 		const [supplier] = list.filter(e => e.id === id);
-		// formik.setFieldValue('status', supplier.status);
-		// formik.setFieldValue('cnpj', supplier.cnpj);
-		// formik.setFieldValue('type', supplier.type);
-		// formik.setFieldValue('name', supplier.name);
-		// formik.setFieldValue('fantasy', supplier.fantasy);
-		// formik.setFieldValue('street', supplier.street);
-		// formik.setFieldValue('number', supplier.number);
-		// formik.setFieldValue('complement', supplier.complement);
-		// formik.setFieldValue('zip', supplier.zip);
-		// formik.setFieldValue('neighborhood', supplier.neighborhood);
-		// await handleChangeState(supplier.state);
-		// formik.setFieldValue('city', supplier.city);
-		// formik.setFieldValue('phone', supplier.phone);
-		// formik.setFieldValue('active', supplier.active);
+		formik.setFieldValue('cnpj', supplier.cnpj);
+		formik.setFieldValue('name', supplier.name);
+		formik.setFieldValue('street', supplier.address.street);
+		formik.setFieldValue('number', supplier.address.number);
+		formik.setFieldValue('complement', supplier.address.complement);
+		formik.setFieldValue('zip', supplier.address.zipcode);
+		formik.setFieldValue('neighborhood', supplier.address.neighborhood);
+		await handleChangeState(supplier.address.state);
+		formik.setFieldValue('city', supplier.address.city);
+		formik.setFieldValue('active', supplier.active);
 
 		setId(id);
 		setOpen(true);
 	};
 
-	const handleChangeList = (ids: readonly string[]) => {
+	const handleBranchsTableOnDelete = (ids: readonly string[]) => {
 		setList(list.filter(e => !ids.includes(e.id)));
 	};
 
@@ -222,6 +222,11 @@ const Branch: NextPage = () => {
 		setCities(await retrieveCitiesByState(choice[0].code));
 	};
 
+	const handleCancelCreateOrUpdate = () => {
+		setId('');
+		handleClose();
+	};
+
 	React.useEffect(() => {}, []);
 
 	return (
@@ -239,9 +244,9 @@ const Branch: NextPage = () => {
 
 			<BranchsTable
 				data={list}
-				onEdit={edit}
+				onEdit={handleBranchsTableOnEdit}
 				label="Filiais"
-				onDelete={handleChangeList}
+				onDelete={handleBranchsTableOnDelete}
 			/>
 			<Modal
 				open={open}
@@ -262,7 +267,7 @@ const Branch: NextPage = () => {
 							<Grid item>
 								<PageTag label="Cadastrar Fornecedor" />
 							</Grid>
-							<Grid container item direction="row" spacing={2} padding={1}>
+							<Grid container item direction="row" spacing={1} padding={1}>
 								<Grid item xs={8} sm={8} md={8} lg={6} xl={6}>
 									<TextInput
 										name="cnpj"
@@ -284,7 +289,7 @@ const Branch: NextPage = () => {
 									</LoadingButton>
 								</Grid>
 							</Grid>
-							<Grid container item direction="row" spacing={2} padding={1}>
+							<Grid container item direction="row" spacing={1} padding={1}>
 								<Grid item xs={12} sm={12} md={12} lg={12} xl={6}>
 									<TextInput
 										name="name"
@@ -294,34 +299,17 @@ const Branch: NextPage = () => {
 										error={formik.errors.name}
 									/>
 								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={12} xl={6}>
+								<Grid item xs={4} sm={5} md={4} lg={4} xl={2}>
 									<TextInput
-										name="fantasy"
-										value={formik.values.fantasy}
-										title="Nome Fantasia"
+										name="zip"
+										value={cepMask(formik.values.zip)}
+										title="CEP"
 										onChange={handleChange}
-										error={formik.errors.fantasy}
+										error={formik.errors.zip}
 									/>
 								</Grid>
-								<Grid item xs={6} sm={6} md={6} lg={3} xl={2}>
-									<TextInput
-										name="type"
-										value={formik.values.type}
-										title="Tipo"
-										onChange={handleChange}
-										error={formik.errors.type}
-									/>
-								</Grid>
-								<Grid item xs={6} sm={6} md={6} lg={3} xl={2}>
-									<TextInput
-										name="status"
-										value={formik.values.status}
-										title="Status"
-										onChange={handleChange}
-										error={formik.errors.status}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+
+								<Grid item xs={8} sm={12} md={12} lg={6} xl={6}>
 									<TextInput
 										name="street"
 										value={formik.values.street}
@@ -348,6 +336,15 @@ const Branch: NextPage = () => {
 										error={formik.errors.complement}
 									/>
 								</Grid>
+								<Grid item xs={12} sm={7} md={8} lg={8} xl={6}>
+									<TextInput
+										name="neighborhood"
+										value={formik.values.neighborhood}
+										title="Bairro"
+										onChange={handleChange}
+										error={formik.errors.neighborhood}
+									/>
+								</Grid>
 								<Grid item xs={12} sm={12} md={12} lg={5} xl={4}>
 									<Selecter
 										name="state"
@@ -372,35 +369,26 @@ const Branch: NextPage = () => {
 										onChange={handleChange}
 									/>
 								</Grid>
-								<Grid item xs={12} sm={7} md={8} lg={8} xl={6}>
+
+								<Grid item xs={6} sm={7} md={8} lg={8} xl={6}>
 									<TextInput
-										name="neighborhood"
-										value={formik.values.neighborhood}
-										title="Bairro"
+										name="lat"
+										value={formik.values.lat}
+										title="Latitude"
 										onChange={handleChange}
-										error={formik.errors.neighborhood}
+										error={formik.errors.lat}
+									/>
+								</Grid>
+								<Grid item xs={6} sm={7} md={8} lg={8} xl={6}>
+									<TextInput
+										name="long"
+										value={formik.values.long}
+										title="Longitude"
+										onChange={handleChange}
+										error={formik.errors.long}
 									/>
 								</Grid>
 
-								<Grid item xs={12} sm={5} md={4} lg={4} xl={2}>
-									<TextInput
-										name="zip"
-										value={cepMask(formik.values.zip)}
-										title="CEP"
-										onChange={handleChange}
-										error={formik.errors.zip}
-									/>
-								</Grid>
-
-								<Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-									<TextInput
-										name="phone"
-										value={formik.values.phone}
-										title="Telefone"
-										onChange={handleChange}
-										error={formik.errors.phone}
-									/>
-								</Grid>
 								<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
 									<FormControlLabel
 										control={
@@ -414,8 +402,8 @@ const Branch: NextPage = () => {
 									/>
 								</Grid>
 							</Grid>
-							<Grid container item direction="row" spacing={2} padding={1}>
-								<Grid item xs={12} sm={4} md={3} lg={4} xl={4}>
+							<Grid container item direction="row" spacing={1} padding={1}>
+								<Grid item xs={6} sm={4} md={3} lg={4} xl={4}>
 									<Button
 										fullWidth
 										variant="contained"
@@ -423,7 +411,18 @@ const Branch: NextPage = () => {
 										type="submit"
 										onClick={() => formik.handleSubmit}
 									>
-										Criar
+										{id === '' ? 'Cadastrar' : 'Atualizar'}
+									</Button>
+								</Grid>
+								<Grid item xs={6} sm={4} md={3} lg={4} xl={4}>
+									<Button
+										fullWidth
+										color="error"
+										variant="contained"
+										endIcon={<Close />}
+										onClick={handleCancelCreateOrUpdate}
+									>
+										Cancelar
 									</Button>
 								</Grid>
 							</Grid>

@@ -76,6 +76,12 @@ const headCells: readonly HeadCell[] = [
 		disablePadding: false,
 		label: 'Estado',
 	},
+	{
+		id: 'active',
+		numeric: false,
+		disablePadding: false,
+		label: 'Status',
+	},
 ];
 
 interface EnhancedTableProps {
@@ -319,6 +325,7 @@ export const BranchsTable = ({
 				lat: branch?.coordinates?.lat,
 				long: branch?.coordinates?.long,
 				position: index + 1,
+				active: branch?.active === true ? 'Ativo' : 'Inativo',
 			} as IBranchShow;
 		});
 		setRenderer(branchs);
@@ -359,7 +366,7 @@ export const BranchsTable = ({
 								getComparator(order, orderBy),
 							)
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-								.map(({ id, name, city, cnpj }, index) => {
+								.map(({ id, name, city, cnpj, active, state }, index) => {
 									const isItemSelected = isSelected(id.toString());
 									const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -395,6 +402,8 @@ export const BranchsTable = ({
 											<TableCell align="left">{name}</TableCell>
 											<TableCell align="left">{cnpjMask(cnpj)}</TableCell>
 											<TableCell align="left">{city}</TableCell>
+											<TableCell align="left">{state}</TableCell>
+											<TableCell align="left">{active}</TableCell>
 										</TableRow>
 									);
 								})}
