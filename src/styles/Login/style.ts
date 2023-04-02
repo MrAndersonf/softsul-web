@@ -28,6 +28,7 @@ export const Form = styled.form`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	background-color: #fff;
 `;
 
 export const Centro = styled.p`
@@ -45,14 +46,14 @@ export const Pool = styled.p`
 `;
 
 export const Forgot = styled(Button).attrs(Props => ({}))`
-	width: 200px;
+	display: flex;
+	width: 160px;
 	height: 50px;
+	flex-direction: row;
+	justify-content: flex-end;
 	border: none;
-	color: #fff;
-	background-color: transparent;
-	align-self: flex-end;
-
-	cursor: pointer;
+	background-color: #fff;
+	margin-right: -3px;
 `;
 
 export const CheckArea = styled.div`
@@ -68,7 +69,7 @@ export const ButtonTitle = styled.span`
 	color: #646d6f;
 	text-transform: none;
 	font-weight: 700;
-	font-size: 13px;
+	font-size: 15px;
 	font-family: 'Arve';
 	&:hover {
 		color: #0273e5;
@@ -85,13 +86,13 @@ export const TitleKeep = styled.span`
 	color: #646d6f;
 	text-transform: none;
 	font-weight: 700;
-	font-size: 13px;
+	font-size: 15px;
 	font-family: 'Arve';
 `;
 
 export const Controls = styled.div`
 	display: flex;
-	width: 330px;
+	width: 100%;
 	height: 50px;
 	margin: 0 0 20px 0;
 	flex-direction: row;

@@ -32,7 +32,7 @@ const Login: NextPage = () => {
 
 	const formik = useFormik({
 		validationSchema: schema,
-		validateOnBlur: false,
+		validateOnBlur: true,
 		validateOnChange: false,
 		initialValues: {
 			email: '',
@@ -136,7 +136,10 @@ const Login: NextPage = () => {
 
 				<Controls>
 					<CheckArea onClick={handleKeep}>
-						<Checkbox checked={formik.values.keep} />
+						<Checkbox
+							checked={formik.values.keep}
+							style={{ display: 'flex', marginLeft: -10 }}
+						/>
 						<TitleKeep>Manter conectado</TitleKeep>
 					</CheckArea>
 
