@@ -36,6 +36,7 @@ import {
 	cnpjRegex,
 	retrieveCitiesByState,
 	truncate,
+	delay,
 } from 'utils';
 import { Add, Close, NewDocument } from 'icons';
 import { useCustomContext } from 'context';
@@ -152,9 +153,11 @@ const Branch: NextPage = () => {
 		const { cnpj } = formik.values;
 		try {
 			setLoad(true);
-			const parsedCNPJ = sanitize(cnpj);
+			await delay(500);
+			const parsedCNPJ = sanitize(cnpj).substring(0, 14);
 			if (parsedCNPJ.length !== 14) {
 				Snack.warning('O CNPJ precisa conter 14 digitos');
+				setLoad(false);
 				return;
 			}
 			const data = await getCNPJ(parsedCNPJ);
@@ -229,6 +232,8 @@ const Branch: NextPage = () => {
 
 	React.useEffect(() => {}, []);
 
+	console.log(formik.values);
+
 	return (
 		<Main>
 			<SideMenu />
@@ -262,13 +267,13 @@ const Branch: NextPage = () => {
 							direction="column"
 							elevation={12}
 							component={Paper}
-							minWidth={400}
+							minWidth={330}
 						>
 							<Grid item>
 								<PageTag label="Cadastrar Fornecedor" />
 							</Grid>
 							<Grid container item direction="row" spacing={1} padding={1}>
-								<Grid item xs={8} sm={8} md={8} lg={6} xl={6}>
+								<Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
 									<TextInput
 										name="cnpj"
 										value={cnpjMask(formik.values.cnpj)}
@@ -277,7 +282,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.cnpj}
 									/>
 								</Grid>
-								<Grid item xs={4} sm={4} md={4} lg={3} xl={2}>
+								<Grid item xs={4} sm={4} md={4} lg={4} xl={2}>
 									<LoadingButton
 										fullWidth
 										loading={load}
@@ -290,7 +295,7 @@ const Branch: NextPage = () => {
 								</Grid>
 							</Grid>
 							<Grid container item direction="row" spacing={1} padding={1}>
-								<Grid item xs={12} sm={12} md={12} lg={12} xl={6}>
+								<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
 									<TextInput
 										name="name"
 										value={formik.values.name}
@@ -299,7 +304,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.name}
 									/>
 								</Grid>
-								<Grid item xs={4} sm={5} md={4} lg={4} xl={2}>
+								<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
 									<TextInput
 										name="zip"
 										value={cepMask(formik.values.zip)}
@@ -309,7 +314,7 @@ const Branch: NextPage = () => {
 									/>
 								</Grid>
 
-								<Grid item xs={8} sm={12} md={12} lg={6} xl={6}>
+								<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
 									<TextInput
 										name="street"
 										value={formik.values.street}
@@ -318,7 +323,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.street}
 									/>
 								</Grid>
-								<Grid item xs={4} sm={4} md={3} lg={3} xl={2}>
+								<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
 									<TextInput
 										name="number"
 										value={formik.values.number}
@@ -327,7 +332,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.number}
 									/>
 								</Grid>
-								<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
+								<Grid item xs={8} sm={8} md={9} lg={9} xl={6}>
 									<TextInput
 										name="complement"
 										value={formik.values.complement}
@@ -336,7 +341,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.complement}
 									/>
 								</Grid>
-								<Grid item xs={12} sm={7} md={8} lg={8} xl={6}>
+								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
 									<TextInput
 										name="neighborhood"
 										value={formik.values.neighborhood}
@@ -345,7 +350,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.neighborhood}
 									/>
 								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={5} xl={4}>
+								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
 									<Selecter
 										name="state"
 										title="Estado"
@@ -357,7 +362,7 @@ const Branch: NextPage = () => {
 										onChange={handleChange}
 									/>
 								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={7} xl={6}>
+								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
 									<Selecter
 										name="city"
 										title="Cidade"
@@ -370,7 +375,7 @@ const Branch: NextPage = () => {
 									/>
 								</Grid>
 
-								<Grid item xs={6} sm={7} md={8} lg={8} xl={6}>
+								<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
 									<TextInput
 										name="lat"
 										value={formik.values.lat}
@@ -379,7 +384,7 @@ const Branch: NextPage = () => {
 										error={formik.errors.lat}
 									/>
 								</Grid>
-								<Grid item xs={6} sm={7} md={8} lg={8} xl={6}>
+								<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
 									<TextInput
 										name="long"
 										value={formik.values.long}
@@ -389,7 +394,7 @@ const Branch: NextPage = () => {
 									/>
 								</Grid>
 
-								<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+								<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
 									<FormControlLabel
 										control={
 											<Checkbox
@@ -403,7 +408,7 @@ const Branch: NextPage = () => {
 								</Grid>
 							</Grid>
 							<Grid container item direction="row" spacing={1} padding={1}>
-								<Grid item xs={6} sm={4} md={3} lg={4} xl={4}>
+								<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
 									<Button
 										fullWidth
 										variant="contained"
@@ -414,7 +419,7 @@ const Branch: NextPage = () => {
 										{id === '' ? 'Cadastrar' : 'Atualizar'}
 									</Button>
 								</Grid>
-								<Grid item xs={6} sm={4} md={3} lg={4} xl={4}>
+								<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
 									<Button
 										fullWidth
 										color="error"

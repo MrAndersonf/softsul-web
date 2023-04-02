@@ -166,7 +166,8 @@ export const cnpjMask = (text: string | undefined) => {
 			.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
 			.replace(/\.(\d{3})(\d)/, '.$1/$2')
 			.replace(/(\d{4})(\d)/, '$1-$2')
-			.replace(/(-\d{2})(\d)/, '$1');
+			.replace(/(-\d{2})(\d)/, '$1')
+			.substring(0, 18);
 	}
 	return '';
 };
@@ -200,7 +201,8 @@ export const cepMask = (text: string | undefined) => {
 
 export const cpfRegex = /^(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2})|([0-9]{11}))$/;
 export const cepRegex = /^([\d]{2})([\d]{3})([\d]{3})|^[\d]{2}.[\d]{3}-[\d]{3}/;
-export const cnpjRegex = /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/;
+export const cnpjRegex =
+	/^(([0-9]{2}.[0-9]{3}.[0-9]{3}\/[0-9]{4}-[0-9]{2})|([0-9]{14}))$/;
 export const emailRegex =
 	/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 export const day = 1000 * 60 * 60 * 24;
