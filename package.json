@@ -1,22 +1,46 @@
 {
-  "name": "softsul-web",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@types/node": "18.15.11",
-    "@types/react": "18.0.31",
-    "@types/react-dom": "18.0.11",
-    "eslint": "8.37.0",
-    "eslint-config-next": "13.2.4",
-    "next": "13.2.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "typescript": "5.0.3"
-  }
+	"name": "softsul-web",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
+	},
+	"resolutions": {
+		"@types/react": "17.0.2",
+		"@types/react-dom": "17.0.2"
+	},
+	"dependencies": {
+		"@emotion/react": "^11.10.6",
+		"@emotion/styled": "^11.10.6",
+		"@material-ui/core": "^4.12.4",
+		"@material-ui/icons": "^4.11.3",
+		"@mui/icons-material": "^5.11.11",
+		"@mui/lab": "^5.0.0-alpha.124",
+		"@mui/material": "^5.11.15",
+		"axios": "^1.3.4",
+		"babel-plugin-module-resolver": "4.1.0",
+		"eslint": "8.37.0",
+		"eslint-config-next": "12.1.0",
+		"formik": "^2.2.9",
+		"jspdf": "^2.5.1",
+		"mui-react-alert": "1.0.7",
+		"next": "12.1.0",
+		"notistack": "2.0.7",
+		"react": "17.0.2",
+		"react-alert": "7.0.3",
+		"react-dom": "17.0.2",
+		"styled-components": "5.3.5",
+		"yup": "^1.0.2"
+	},
+	"devDependencies": {
+		"@types/node": "17.0.39",
+		"@types/react": "17.0.38",
+		"@types/styled-components": "^5.1.26",
+		"babel-plugin-styled-components": "^2.0.7",
+		"typescript": "4.6.2"
+	}
 }
