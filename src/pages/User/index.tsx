@@ -9,7 +9,6 @@ import { Selecter } from 'components/Selecter';
 import { PageTag } from 'components/PageTag';
 import { TextInput } from 'components/TextInput';
 import { SideMenu } from 'components/SideMenu';
-import { TableSupplier } from 'components/TableSupplier';
 
 import * as yup from 'yup';
 import { useFormik } from 'formik';
@@ -237,12 +236,6 @@ const Branch: NextPage = () => {
 				]}
 			/>
 
-			<TableSupplier
-				data={list}
-				edit={edit}
-				label="Fornecedores"
-				listHandle={handleChangeList}
-			/>
 			<Modal
 				open={open}
 				onClose={handleClose}
