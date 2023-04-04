@@ -41,9 +41,9 @@ export interface IAddress {
 	zipcode: string;
 	street: string;
 	number: string;
-	reference: string;
+	reference: string | null;
 	neighborhood: string;
-	complement?: string;
+	complement: string | null;
 	city: string;
 	state: string;
 }

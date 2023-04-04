@@ -1,7 +1,7 @@
 import Snackbar from 'components/Snack';
-import { IBranch } from 'interfaces';
+import { IUser } from 'interfaces';
 import axios from 'service/axios';
-export class BranchModel {
+export class UserModel {
 	private _name: string;
 	public get name(): string {
 		return this._name;
@@ -10,36 +10,20 @@ export class BranchModel {
 		this._name = v;
 	}
 
-	private _cnpj: string;
-	public get cnpj(): string {
-		return this._cnpj;
+	private _email: string;
+	public get email(): string {
+		return this._email;
 	}
-	public set cnpj(v: string) {
-		this._cnpj = v;
-	}
-
-	private _addressId: number;
-	public get addressId(): number {
-		return this._addressId;
-	}
-	public set addressId(v: number) {
-		this._addressId = v;
+	public set email(v: string) {
+		this._email = v;
 	}
 
-	private _lat: string;
-	public get lat(): string {
-		return this._lat;
+	private _password: string;
+	public get password(): string {
+		return this._password;
 	}
-	public set lat(v: string) {
-		this._lat = v;
-	}
-
-	private _long: string;
-	public get long(): string {
-		return this._long;
-	}
-	public set long(v: string) {
-		this._long = v;
+	public set password(v: string) {
+		this._password = v;
 	}
 
 	private _active: boolean;
@@ -50,26 +34,22 @@ export class BranchModel {
 		this._active = v;
 	}
 
-	constructor(branch: IBranch) {
-		this._name = branch.name;
-		this._cnpj = branch.cnpj;
-		this._addressId = branch.addressId;
-		this._lat = branch.lat;
-		this._long = branch.long;
-		this._active = branch.active;
+	constructor(user: IUser) {
+		this._name = user.name;
+		this._email = user.email;
+		this._password = user.password;
+		this._active = user.active;
 	}
 
 	public async create() {
 		try {
-			const newBranch = {
+			const create = {
 				name: this._name,
-				cnpj: this._cnpj,
-				addressId: this._addressId,
-				lat: this._lat,
-				long: this._long,
+				email: this._email,
+				password: this._password,
 				active: this._active,
 			};
-			const branch = await axios.post<IBranch>('/api/branch', newBranch);
+			const branch = await axios.post<IUser>('/api/branch', create);
 			if (branch.status === 200) {
 				return branch.data;
 			}
@@ -83,13 +63,11 @@ export class BranchModel {
 		try {
 			const updated = {
 				name: this._name,
-				cnpj: this._cnpj,
-				addressId: this._addressId,
-				lat: this._lat,
-				long: this._long,
+				email: this._email,
+				password: this._password,
 				active: this._active,
 			};
-			const branch = await axios.put<IBranch>(`/api/branch/${id}`, updated);
+			const branch = await axios.put<IUser>(`/api/branch/${id}`, updated);
 			if (branch.status === 200) {
 				return branch.data;
 			}
@@ -101,7 +79,7 @@ export class BranchModel {
 
 	public static async delete(id: string) {
 		try {
-			const branch = await axios.delete<IBranch>(`/api/branch/${id}`);
+			const branch = await axios.delete<IUser>(`/api/branch/${id}`);
 			if (branch.status === 200) {
 				return branch.data;
 			}
@@ -113,7 +91,7 @@ export class BranchModel {
 
 	public static async all() {
 		try {
-			const branches = await axios<IBranch[]>('/api/branch');
+			const branches = await axios<IUser[]>('/api/branch');
 			if (branches.status === 200) {
 				return branches.data;
 			}
@@ -125,7 +103,7 @@ export class BranchModel {
 
 	public static async getById(id: string) {
 		try {
-			const branch = await axios<IBranch>(`/api/branch/${id}`);
+			const branch = await axios<IUser>(`/api/branch/${id}`);
 			if (branch.status === 200) {
 				return branch.data;
 			}

@@ -9,6 +9,9 @@ import { Selecter } from 'components/Selecter';
 import { PageTag } from 'components/PageTag';
 import { TextInput } from 'components/TextInput';
 import { SideMenu } from 'components/SideMenu';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 
 import * as yup from 'yup';
 import { useFormik } from 'formik';
@@ -24,6 +27,7 @@ import {
 	Button,
 	Checkbox,
 	FormControlLabel,
+	Tab,
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {
@@ -62,6 +66,11 @@ const Branch: NextPage = () => {
 	const [load, setLoad] = useState<boolean>(false);
 	const [open, setOpen] = React.useState(false);
 	const [cities, setCities] = useState<any[]>([]);
+	const [value, setValue] = React.useState('1');
+
+	const handleChangeTab = (event: React.SyntheticEvent, newValue: string) => {
+		setValue(newValue);
+	};
 
 	const schema = yup.object().shape({
 		name: yup.string().required('Campo obrigatório'),
@@ -141,6 +150,8 @@ const Branch: NextPage = () => {
 		await handleChangeState(supplier.address.state);
 		formik.setFieldValue('city', supplier.address.city);
 		formik.setFieldValue('active', supplier.active);
+		formik.setFieldValue('lat', supplier?.lat);
+		formik.setFieldValue('long', supplier?.long);
 
 		setId(id);
 		setOpen(true);
@@ -271,178 +282,191 @@ const Branch: NextPage = () => {
 				closeAfterTransition
 			>
 				<Box sx={style}>
-					<Form onSubmit={formik.handleSubmit}>
-						<Grid
-							container
-							direction="column"
-							elevation={12}
-							component={Paper}
-							minWidth={330}
+					<TabContext value={value}>
+						<Box
+							sx={{
+								borderBottom: 1,
+								borderColor: 'divider',
+								backgroundColor: '#fff',
+							}}
 						>
-							<Grid item>
-								<PageTag label="Cadastrar Fornecedor" />
-							</Grid>
-							<Grid container item direction="row" spacing={1} padding={1}>
-								<Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
-									<TextInput
-										name="cnpj"
-										value={cnpjMask(formik.values.cnpj)}
-										title="CNPJ do Fornecedor"
-										onChange={handleChange}
-										error={formik.errors.cnpj}
-									/>
-								</Grid>
-								<Grid item xs={4} sm={4} md={4} lg={4} xl={2}>
-									<LoadingButton
-										fullWidth
-										loading={load}
-										variant="contained"
-										onClick={handleCNPJ}
-										endIcon={<Search />}
-									>
-										Buscar
-									</LoadingButton>
-								</Grid>
-							</Grid>
-							<Grid container item direction="row" spacing={1} padding={1}>
-								<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
-									<TextInput
-										name="name"
-										value={formik.values.name}
-										title="Razão Social"
-										onChange={handleChange}
-										error={formik.errors.name}
-									/>
-								</Grid>
-								<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
-									<TextInput
-										name="zip"
-										value={cepMask(formik.values.zip)}
-										title="CEP"
-										onChange={handleChange}
-										error={formik.errors.zip}
-									/>
-								</Grid>
-
-								<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
-									<TextInput
-										name="street"
-										value={formik.values.street}
-										title="Logradouro"
-										onChange={handleChange}
-										error={formik.errors.street}
-									/>
-								</Grid>
-								<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
-									<TextInput
-										name="number"
-										value={formik.values.number}
-										title="Número"
-										onChange={handleChange}
-										error={formik.errors.number}
-									/>
-								</Grid>
-								<Grid item xs={8} sm={8} md={9} lg={9} xl={6}>
-									<TextInput
-										name="complement"
-										value={formik.values.complement}
-										title="Complemento"
-										onChange={handleChange}
-										error={formik.errors.complement}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-									<TextInput
-										name="neighborhood"
-										value={formik.values.neighborhood}
-										title="Bairro"
-										onChange={handleChange}
-										error={formik.errors.neighborhood}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-									<Selecter
-										name="state"
-										title="Estado"
-										options={states.map(e => {
-											return { value: e.name, text: e.name };
-										})}
-										error={formik.errors.state}
-										value={formik.values.state}
-										onChange={handleChange}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-									<Selecter
-										name="city"
-										title="Cidade"
-										options={cities.map(e => {
-											return { text: e.nome, value: e.nome };
-										})}
-										error={formik.errors.city}
-										value={formik.values.city}
-										onChange={handleChange}
-									/>
-								</Grid>
-
-								<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
-									<TextInput
-										name="lat"
-										value={formik.values.lat}
-										title="Latitude"
-										onChange={handleChange}
-										error={formik.errors.lat}
-									/>
-								</Grid>
-								<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
-									<TextInput
-										name="long"
-										value={formik.values.long}
-										title="Longitude"
-										onChange={handleChange}
-										error={formik.errors.long}
-									/>
-								</Grid>
-
-								<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
-									<FormControlLabel
-										control={
-											<Checkbox
-												name="active"
-												checked={formik.values.active}
-												onChange={formik.handleChange}
+							<TabList
+								onChange={handleChangeTab}
+								aria-label="lab API tabs example"
+							>
+								<Tab label="Item One" value="1" />
+								<Tab label="Item Two" value="2" />
+								<Tab label="Item Three" value="3" />
+							</TabList>
+						</Box>
+						<TabPanel style={{ backgroundColor: '#fff' }} value="1">
+							<Form onSubmit={formik.handleSubmit}>
+								<Grid container direction="column" component={'div'}>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
+											<TextInput
+												name="cnpj"
+												value={cnpjMask(formik.values.cnpj)}
+												title="CNPJ do Fornecedor"
+												onChange={handleChange}
+												error={formik.errors.cnpj}
 											/>
-										}
-										label="Ativo"
-									/>
+										</Grid>
+										<Grid item xs={4} sm={4} md={4} lg={4} xl={2}>
+											<LoadingButton
+												fullWidth
+												loading={load}
+												variant="contained"
+												onClick={handleCNPJ}
+												endIcon={<Search />}
+											>
+												Buscar
+											</LoadingButton>
+										</Grid>
+									</Grid>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
+											<TextInput
+												name="name"
+												value={formik.values.name}
+												title="Razão Social"
+												onChange={handleChange}
+												error={formik.errors.name}
+											/>
+										</Grid>
+										<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
+											<TextInput
+												name="zip"
+												value={cepMask(formik.values.zip)}
+												title="CEP"
+												onChange={handleChange}
+												error={formik.errors.zip}
+											/>
+										</Grid>
+
+										<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
+											<TextInput
+												name="street"
+												value={formik.values.street}
+												title="Logradouro"
+												onChange={handleChange}
+												error={formik.errors.street}
+											/>
+										</Grid>
+										<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
+											<TextInput
+												name="number"
+												value={formik.values.number}
+												title="Número"
+												onChange={handleChange}
+												error={formik.errors.number}
+											/>
+										</Grid>
+										<Grid item xs={8} sm={8} md={9} lg={9} xl={6}>
+											<TextInput
+												name="complement"
+												value={formik.values.complement}
+												title="Complemento"
+												onChange={handleChange}
+												error={formik.errors.complement}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+											<TextInput
+												name="neighborhood"
+												value={formik.values.neighborhood}
+												title="Bairro"
+												onChange={handleChange}
+												error={formik.errors.neighborhood}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+											<Selecter
+												name="state"
+												title="Estado"
+												options={states.map(e => {
+													return { value: e.name, text: e.name };
+												})}
+												error={formik.errors.state}
+												value={formik.values.state}
+												onChange={handleChange}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+											<Selecter
+												name="city"
+												title="Cidade"
+												options={cities.map(e => {
+													return { text: e.nome, value: e.nome };
+												})}
+												error={formik.errors.city}
+												value={formik.values.city}
+												onChange={handleChange}
+											/>
+										</Grid>
+
+										<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
+											<TextInput
+												name="lat"
+												value={formik.values.lat}
+												title="Latitude"
+												onChange={handleChange}
+												error={formik.errors.lat}
+											/>
+										</Grid>
+										<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
+											<TextInput
+												name="long"
+												value={formik.values.long}
+												title="Longitude"
+												onChange={handleChange}
+												error={formik.errors.long}
+											/>
+										</Grid>
+
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
+											<FormControlLabel
+												control={
+													<Checkbox
+														name="active"
+														checked={formik.values.active}
+														onChange={formik.handleChange}
+													/>
+												}
+												label="Ativo"
+											/>
+										</Grid>
+									</Grid>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
+											<Button
+												fullWidth
+												variant="contained"
+												endIcon={<AddCircleOutlineIcon />}
+												type="submit"
+												onClick={() => formik.handleSubmit}
+											>
+												{id === '' ? 'Cadastrar' : 'Atualizar'}
+											</Button>
+										</Grid>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
+											<Button
+												fullWidth
+												color="error"
+												variant="contained"
+												endIcon={<Close />}
+												onClick={handleCancelCreateOrUpdate}
+											>
+												Cancelar
+											</Button>
+										</Grid>
+									</Grid>
 								</Grid>
-							</Grid>
-							<Grid container item direction="row" spacing={1} padding={1}>
-								<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
-									<Button
-										fullWidth
-										variant="contained"
-										endIcon={<AddCircleOutlineIcon />}
-										type="submit"
-										onClick={() => formik.handleSubmit}
-									>
-										{id === '' ? 'Cadastrar' : 'Atualizar'}
-									</Button>
-								</Grid>
-								<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
-									<Button
-										fullWidth
-										color="error"
-										variant="contained"
-										endIcon={<Close />}
-										onClick={handleCancelCreateOrUpdate}
-									>
-										Cancelar
-									</Button>
-								</Grid>
-							</Grid>
-						</Grid>
-					</Form>
+							</Form>
+						</TabPanel>
+						<TabPanel value="2">Item Two</TabPanel>
+						<TabPanel value="3">Item Three</TabPanel>
+					</TabContext>
 				</Box>
 			</Modal>
 		</Main>
