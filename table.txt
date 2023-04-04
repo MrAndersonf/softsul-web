@@ -1,0 +1,43 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE TABLE "users" (
+	"name" varchar(100) NOT NULL,
+	"email" varchar(120) NOT NULL,
+	"password" varchar(100) NOT NULL,
+	"id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	"active" BOOLEAN NOT NULL
+	
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "branchs" (
+	"id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	"name" varchar(255) NOT NULL,
+	"cnpj" varchar(14) NOT NULL UNIQUE,
+	"email" varchar(120) NOT NULL,
+	"lat" varchar(120) NOT NULL,
+	"long" varchar(120) NOT NULL,
+	"active" BOOLEAN NOT NULL,
+	"address_fk" uuid NOT NULL	
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "addresses" (
+	"zipcode" varchar(8) NOT NULL,
+	"street" varchar(255) NOT NULL,
+	"number" varchar(255),
+	"reference" varchar(255),
+	"neighborhood" varchar(255) NOT NULL,
+	"complement" varchar(255),
+	"city" varchar(255) NOT NULL,
+	"state" varchar(255) NOT NULL,
+	"id" UUID PRIMARY KEY DEFAULT uuid_generate_v4()	
+) WITH (
+  OIDS=FALSE
+);
+
+
+
+
+ALTER TABLE "public.branchs" ADD CONSTRAINT "branchs_fk0" FOREIGN KEY ("address_fk") REFERENCES "public.addresses"("id");

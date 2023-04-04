@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import axios from 'service/axios';
 import Snack from 'components/Snack';
 import { Main } from 'components/Main';
 import { Form } from 'components/Form';
@@ -42,6 +42,7 @@ import { Add, Close, NewDocument } from 'icons';
 import { useCustomContext } from 'context';
 import { useRouter } from 'next/router';
 import { BranchsTable } from 'components/BranchsTable';
+import { BranchModel } from 'Model/BranchModel';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -230,9 +231,18 @@ const Branch: NextPage = () => {
 		handleClose();
 	};
 
-	React.useEffect(() => {}, []);
-
-	console.log(formik.values);
+	React.useEffect(() => {
+		(async () => {
+			try {
+				const all = await BranchModel.all();
+				if (all !== undefined) {
+					setList(all);
+				}
+			} catch (error: any) {
+				Snack.error('Erro ao carregar filiais ' + error.message);
+			}
+		})();
+	}, []);
 
 	return (
 		<Main>

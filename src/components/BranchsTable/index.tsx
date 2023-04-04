@@ -322,8 +322,8 @@ export const BranchsTable = ({
 				cnpj: branch?.cnpj,
 				city: branch?.address?.city,
 				state: branch?.address?.state,
-				lat: branch?.coordinates?.lat,
-				long: branch?.coordinates?.long,
+				lat: branch?.lat,
+				long: branch?.long,
 				position: index + 1,
 				active: branch?.active === true ? 'Ativo' : 'Inativo',
 			} as IBranchShow;

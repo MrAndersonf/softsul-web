@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Address {
+  id           String     @id @default(uuid())
+  zipcode      String  @db.VarChar(8)
+  street       String  @db.VarChar(255)
+  number       String  @db.VarChar(80)
+  reference    String? @db.VarChar(255)
+  neighborhood String? @db.VarChar(255)
+  complement   String? @db.VarChar(255)
+  city         String  @db.VarChar(255)
+  state        String  @db.VarChar(255)
+  branch       Branch?
+}
+
+model User {
+  id       String     @id @default(uuid())
+  email    String  @db.VarChar(100)
+  name     String  @db.VarChar(100)
+  active   Boolean @default(true)
+  password String  @db.VarChar(100)
+}
+
+model Branch {
+  id        String     @id @default(uuid())
+  name      String  @db.VarChar(100)
+  cnpj      String  @db.VarChar(100)
+  addressId String     @unique
+  email     String  @unique
+  lat       String  @db.VarChar(100)
+  long      String  @db.VarChar(100)
+  active    Boolean @default(true)
+  address   Address @relation(fields: [addressId], references: [id])
+}
