@@ -387,6 +387,7 @@ const Branch: NextPage = () => {
 														/>
 													}
 													label="Ativo"
+													title="Ativo"
 												/>
 											</Grid>
 										</Grid>
