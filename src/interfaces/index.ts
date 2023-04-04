@@ -16,7 +16,7 @@ export interface IBranch {
 	id: string;
 	name: string;
 	cnpj: string;
-	addressId: number;
+	addressId: string;
 	email: string;
 	lat: string;
 	long: string;

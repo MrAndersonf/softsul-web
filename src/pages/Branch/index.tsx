@@ -16,7 +16,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import type { NextPage } from 'next';
-import { IBranch } from 'interfaces';
+import { IAddress, IBranch } from 'interfaces';
 import { LoadingButton } from '@mui/lab';
 import { Search } from '@mui/icons-material';
 import {
@@ -47,6 +47,7 @@ import { useCustomContext } from 'context';
 import { useRouter } from 'next/router';
 import { BranchsTable } from 'components/BranchsTable';
 import { BranchModel } from 'Model/BranchModel';
+import { AddressModel } from 'Model/AddressModel';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -63,6 +64,8 @@ const Branch: NextPage = () => {
 	const router = useRouter();
 	const { loading } = useCustomContext();
 	const [id, setId] = useState<string>('');
+	const [updateAddress, setUpdateAddress] = useState<string>('');
+	const [updateBranch, setUpdateBranch] = useState<string>('');
 	const [list, setList] = useState<IBranch[]>([]);
 	const [load, setLoad] = useState<boolean>(false);
 	const [open, setOpen] = React.useState(false);
@@ -75,9 +78,7 @@ const Branch: NextPage = () => {
 
 	const schema = yup.object().shape({
 		name: yup.string().required('Campo obrigatório'),
-		status: yup.string().required('Campo obrigatório'),
-		fantasy: yup.string().required('Campo obrigatório'),
-		type: yup.string().required('Campo obrigatório'),
+
 		street: yup.string().required('Campo obrigatório'),
 		zip: yup
 			.string()
@@ -88,7 +89,7 @@ const Branch: NextPage = () => {
 		number: yup.string().required('Campo obrigatório'),
 		city: yup.string().required('Campo obrigatório'),
 		state: yup.string().required('Campo obrigatório'),
-		phone: yup.string().required('Campo obrigatório'),
+
 		lat: yup.string().required('Campo obrigatório'),
 		long: yup.string().required('Campo obrigatório'),
 
@@ -107,36 +108,73 @@ const Branch: NextPage = () => {
 		initialValues: {
 			status: '',
 			cnpj: '',
-			type: '',
+
 			name: '',
-			fantasy: '',
+
 			street: '',
 			number: '',
 			complement: '',
-			zip: '',
+			zipcode: '',
 			neighborhood: '',
 			city: '',
 			state: '',
-			phone: '',
+
 			active: true,
 			lat: '',
 			long: '',
 			email: '',
+			reference: '',
 		},
 		onSubmit: async (values, { resetForm }) => {
-			// const newSupplier = new Supplier(values);
-			// if (id !== '') {
-			// 	const edit = await newSupplier.update(id);
-			// 	setList(list.map(el => (el.id === id ? edit : el)));
-			// 	setId('');
-			// 	handleClose();
-			// 	resetForm();
-			// 	return;
-			// }
-			// const created = await newSupplier.create();
-			// setList([...list, created]);
-			// handleClose();
-			// resetForm();
+			try {
+				const refAddress = {
+					id: '',
+					city: values.city,
+					complement: values.complement,
+					neighborhood: values.neighborhood,
+					number: values.number,
+					state: values.state,
+					street: values.street,
+					zipcode: values.zipcode,
+					reference: values.reference,
+				} as IAddress;
+
+				const address = new AddressModel(refAddress);
+				let updated;
+				if (updateAddress !== '') {
+					updated = await address.update(updateAddress);
+				} else {
+					updated = await address.create();
+				}
+
+				if (updated) {
+					const branch = new BranchModel(
+						values.name,
+						values.cnpj,
+						values.email,
+						updated?.id,
+						values.lat,
+						values.long,
+						values.active,
+					);
+
+					if (updateBranch !== '') {
+						const brancheCreated = await branch.update(updateBranch);
+						console.log(brancheCreated);
+					} else {
+						const newBranch = await branch.create();
+						console.log(newBranch);
+					}
+					setOpen(false);
+					resetForm();
+					setUpdateBranch('');
+					setUpdateAddress('');
+					Snack.success('Operação realizada com sucesso!');
+					setOpen(false);
+				}
+			} catch (error: any) {
+				Snack.error('Erro ao executar ' + error.message);
+			}
 		},
 	});
 
@@ -154,8 +192,10 @@ const Branch: NextPage = () => {
 		formik.setFieldValue('active', supplier.active);
 		formik.setFieldValue('lat', supplier?.lat);
 		formik.setFieldValue('long', supplier?.long);
-
-		setId(id);
+		formik.setFieldValue('email', supplier?.email);
+		formik.setFieldValue('reference', supplier?.address?.reference ?? '');
+		setUpdateBranch(supplier.id);
+		setUpdateAddress(supplier.address.id);
 		setOpen(true);
 	};
 
@@ -256,6 +296,8 @@ const Branch: NextPage = () => {
 			}
 		})();
 	}, []);
+
+	console.log(formik.errors);
 
 	return (
 		<Main>
@@ -358,7 +400,7 @@ const Branch: NextPage = () => {
 													Buscar
 												</LoadingButton>
 											</Grid>
-											<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
+											<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
 												<TextInput
 													name="name"
 													value={formik.values.name}
@@ -367,7 +409,7 @@ const Branch: NextPage = () => {
 													error={formik.errors.name}
 												/>
 											</Grid>
-											<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
+											<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
 												<TextInput
 													name="email"
 													value={formik.values.email}
@@ -379,6 +421,7 @@ const Branch: NextPage = () => {
 
 											<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
 												<FormControlLabel
+													label="Ativo"
 													control={
 														<Checkbox
 															name="active"
@@ -386,41 +429,9 @@ const Branch: NextPage = () => {
 															onChange={formik.handleChange}
 														/>
 													}
-													label="Ativo"
-													title="Ativo"
 												/>
 											</Grid>
 										</Grid>
-										{/* <Grid
-											container
-											item
-											direction="row"
-											spacing={1}
-											padding={1}
-										>
-											<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
-												<Button
-													fullWidth
-													variant="contained"
-													endIcon={<AddCircleOutlineIcon />}
-													type="submit"
-													onClick={() => formik.handleSubmit}
-												>
-													{id === '' ? 'Cadastrar' : 'Atualizar'}
-												</Button>
-											</Grid>
-											<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
-												<Button
-													fullWidth
-													color="error"
-													variant="contained"
-													endIcon={<Close />}
-													onClick={handleCancelCreateOrUpdate}
-												>
-													Cancelar
-												</Button>
-											</Grid>
-										</Grid> */}
 									</Grid>
 								</Form>
 							</TabPanel>
@@ -598,11 +609,11 @@ const Branch: NextPage = () => {
 											</Grid>
 											<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
 												<TextInput
-													name="zip"
-													value={cepMask(formik.values.zip)}
+													name="zipcode"
+													value={cepMask(formik.values.zipcode)}
 													title="CEP"
 													onChange={handleChange}
-													error={formik.errors.zip}
+													error={formik.errors.zipcode}
 												/>
 											</Grid>
 
@@ -711,8 +722,7 @@ const Branch: NextPage = () => {
 													fullWidth
 													variant="contained"
 													endIcon={<AddCircleOutlineIcon />}
-													type="submit"
-													onClick={() => formik.handleSubmit}
+													onClick={formik.submitForm}
 												>
 													{id === '' ? 'Cadastrar' : 'Atualizar'}
 												</Button>

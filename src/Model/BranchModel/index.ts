@@ -18,11 +18,19 @@ export class BranchModel {
 		this._cnpj = v;
 	}
 
-	private _addressId: number;
-	public get addressId(): number {
+	private _email: string;
+	public get email(): string {
+		return this._email;
+	}
+	public set email(v: string) {
+		this._email = v;
+	}
+
+	private _addressId: string;
+	public get addressId(): string {
 		return this._addressId;
 	}
-	public set addressId(v: number) {
+	public set addressId(v: string) {
 		this._addressId = v;
 	}
 
@@ -50,13 +58,22 @@ export class BranchModel {
 		this._active = v;
 	}
 
-	constructor(branch: IBranch) {
-		this._name = branch.name;
-		this._cnpj = branch.cnpj;
-		this._addressId = branch.addressId;
-		this._lat = branch.lat;
-		this._long = branch.long;
-		this._active = branch.active;
+	constructor(
+		name: string,
+		cnpj: string,
+		email: string,
+		addressId: string,
+		lat: string,
+		long: string,
+		active: boolean,
+	) {
+		this._name = name;
+		this._cnpj = cnpj;
+		this._email = email;
+		this._addressId = addressId;
+		this._lat = lat;
+		this._long = long;
+		this._active = active;
 	}
 
 	public async create() {
@@ -64,6 +81,7 @@ export class BranchModel {
 			const newBranch = {
 				name: this._name,
 				cnpj: this._cnpj,
+				email: this.email,
 				addressId: this._addressId,
 				lat: this._lat,
 				long: this._long,
@@ -84,6 +102,7 @@ export class BranchModel {
 			const updated = {
 				name: this._name,
 				cnpj: this._cnpj,
+				email: this.email,
 				addressId: this._addressId,
 				lat: this._lat,
 				long: this._long,
