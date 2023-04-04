@@ -55,7 +55,8 @@ const style = {
 	transform: 'translate(-50%, -50%)',
 	margin: 0,
 	padding: 0,
-	minWidth: 360,
+	minWidth: 330,
+	maxWidth: 500,
 };
 
 const Branch: NextPage = () => {
@@ -120,6 +121,7 @@ const Branch: NextPage = () => {
 			active: true,
 			lat: '',
 			long: '',
+			email: '',
 		},
 		onSubmit: async (values, { resetForm }) => {
 			// const newSupplier = new Supplier(values);
@@ -294,12 +296,250 @@ const Branch: NextPage = () => {
 								onChange={handleChangeTab}
 								aria-label="lab API tabs example"
 							>
-								<Tab label="Item One" value="1" />
-								<Tab label="Item Two" value="2" />
-								<Tab label="Item Three" value="3" />
+								<Tab sx={{ textTransform: 'none' }} label="Filial" value="1" />
+								<Tab
+									sx={{ textTransform: 'none' }}
+									label="Endereço"
+									value="2"
+								/>
+								<Tab sx={{ textTransform: 'none' }} label="Mapa" value="3" />
 							</TabList>
 						</Box>
 						<TabPanel style={{ backgroundColor: '#fff' }} value="1">
+							<Form onSubmit={formik.handleSubmit}>
+								<Grid
+									container
+									direction="column"
+									component={'div'}
+									maxWidth={500}
+									minWidth={330}
+								>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+											<TextInput
+												name="cnpj"
+												value={cnpjMask(formik.values.cnpj)}
+												title="CNPJ da Filial"
+												onChange={handleChange}
+												error={formik.errors.cnpj}
+											/>
+										</Grid>
+										<Grid item xs={4} sm={4} md={4} lg={4} xl={2}>
+											<LoadingButton
+												fullWidth
+												loading={load}
+												variant="contained"
+												onClick={handleCNPJ}
+												endIcon={<Search />}
+											>
+												Buscar
+											</LoadingButton>
+										</Grid>
+									</Grid>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
+											<TextInput
+												name="name"
+												value={formik.values.name}
+												title="Nome da Filial"
+												onChange={handleChange}
+												error={formik.errors.name}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
+											<TextInput
+												name="email"
+												value={formik.values.email}
+												title="E-mail"
+												onChange={handleChange}
+												error={formik.errors.email}
+											/>
+										</Grid>
+
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
+											<FormControlLabel
+												control={
+													<Checkbox
+														name="active"
+														checked={formik.values.active}
+														onChange={formik.handleChange}
+													/>
+												}
+												label="Ativo"
+											/>
+										</Grid>
+									</Grid>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
+											<Button
+												fullWidth
+												variant="contained"
+												endIcon={<AddCircleOutlineIcon />}
+												type="submit"
+												onClick={() => formik.handleSubmit}
+											>
+												{id === '' ? 'Cadastrar' : 'Atualizar'}
+											</Button>
+										</Grid>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
+											<Button
+												fullWidth
+												color="error"
+												variant="contained"
+												endIcon={<Close />}
+												onClick={handleCancelCreateOrUpdate}
+											>
+												Cancelar
+											</Button>
+										</Grid>
+									</Grid>
+								</Grid>
+							</Form>
+						</TabPanel>
+						<TabPanel style={{ backgroundColor: '#fff' }} value="2">
+							<Form onSubmit={formik.handleSubmit}>
+								<Grid container direction="column" component={'div'}>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
+											<TextInput
+												name="name"
+												value={formik.values.name}
+												title="Razão Social"
+												onChange={handleChange}
+												error={formik.errors.name}
+											/>
+										</Grid>
+										<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
+											<TextInput
+												name="zip"
+												value={cepMask(formik.values.zip)}
+												title="CEP"
+												onChange={handleChange}
+												error={formik.errors.zip}
+											/>
+										</Grid>
+
+										<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
+											<TextInput
+												name="street"
+												value={formik.values.street}
+												title="Logradouro"
+												onChange={handleChange}
+												error={formik.errors.street}
+											/>
+										</Grid>
+										<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
+											<TextInput
+												name="number"
+												value={formik.values.number}
+												title="Número"
+												onChange={handleChange}
+												error={formik.errors.number}
+											/>
+										</Grid>
+										<Grid item xs={8} sm={8} md={9} lg={9} xl={6}>
+											<TextInput
+												name="complement"
+												value={formik.values.complement}
+												title="Complemento"
+												onChange={handleChange}
+												error={formik.errors.complement}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+											<TextInput
+												name="neighborhood"
+												value={formik.values.neighborhood}
+												title="Bairro"
+												onChange={handleChange}
+												error={formik.errors.neighborhood}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+											<Selecter
+												name="state"
+												title="Estado"
+												options={states.map(e => {
+													return { value: e.name, text: e.name };
+												})}
+												error={formik.errors.state}
+												value={formik.values.state}
+												onChange={handleChange}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
+											<Selecter
+												name="city"
+												title="Cidade"
+												options={cities.map(e => {
+													return { text: e.nome, value: e.nome };
+												})}
+												error={formik.errors.city}
+												value={formik.values.city}
+												onChange={handleChange}
+											/>
+										</Grid>
+
+										<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
+											<TextInput
+												name="lat"
+												value={formik.values.lat}
+												title="Latitude"
+												onChange={handleChange}
+												error={formik.errors.lat}
+											/>
+										</Grid>
+										<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
+											<TextInput
+												name="long"
+												value={formik.values.long}
+												title="Longitude"
+												onChange={handleChange}
+												error={formik.errors.long}
+											/>
+										</Grid>
+
+										<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
+											<FormControlLabel
+												control={
+													<Checkbox
+														name="active"
+														checked={formik.values.active}
+														onChange={formik.handleChange}
+													/>
+												}
+												label="Ativo"
+											/>
+										</Grid>
+									</Grid>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
+											<Button
+												fullWidth
+												variant="contained"
+												endIcon={<AddCircleOutlineIcon />}
+												type="submit"
+												onClick={() => formik.handleSubmit}
+											>
+												{id === '' ? 'Cadastrar' : 'Atualizar'}
+											</Button>
+										</Grid>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
+											<Button
+												fullWidth
+												color="error"
+												variant="contained"
+												endIcon={<Close />}
+												onClick={handleCancelCreateOrUpdate}
+											>
+												Cancelar
+											</Button>
+										</Grid>
+									</Grid>
+								</Grid>
+							</Form>
+						</TabPanel>
+						<TabPanel style={{ backgroundColor: '#fff' }} value="3">
 							<Form onSubmit={formik.handleSubmit}>
 								<Grid container direction="column" component={'div'}>
 									<Grid container item direction="row" spacing={1} padding={1}>
@@ -464,8 +704,6 @@ const Branch: NextPage = () => {
 								</Grid>
 							</Form>
 						</TabPanel>
-						<TabPanel value="2">Item Two</TabPanel>
-						<TabPanel value="3">Item Three</TabPanel>
 					</TabContext>
 				</Box>
 			</Modal>
