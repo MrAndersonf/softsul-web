@@ -23,8 +23,12 @@ import {
 const Logo = require('../assets/logo.png');
 import { NextPage } from 'next';
 import Image from 'next/image';
+import { useCustomContext } from 'context';
+import { useRouter } from 'next/router';
 
 const Login: NextPage = () => {
+	const router = useRouter();
+	const { signIn, signed, loading } = useCustomContext();
 	const schema = yup.object().shape({
 		email: yup.string().required('Campo obrigatório'),
 		password: yup.string().required('Campo obrigatório'),
@@ -41,7 +45,13 @@ const Login: NextPage = () => {
 			keep: false,
 		},
 
-		onSubmit: async (values, { resetForm }) => {},
+		onSubmit: async (values, { resetForm }) => {
+			const { email, password, keep } = values;
+			const status = await signIn(email, password, keep);
+			if (status) {
+				router.push('/Branch');
+			}
+		},
 	});
 
 	const [visible, setVisible] = React.useState<boolean>(false);
