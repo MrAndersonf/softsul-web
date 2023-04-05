@@ -9,7 +9,7 @@ export interface IMap {
 export const Map = ({ lat, lng }: IMap) => {
 	const [loading, setLoading] = React.useState<boolean>(true);
 	const loader = new Loader({
-		apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+		apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
 		version: 'weekly',
 		libraries: ['places'],
 	});
