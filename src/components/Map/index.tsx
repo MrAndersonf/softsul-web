@@ -1,32 +1,18 @@
 import React, { useEffect } from 'react';
-
-import { useRouter } from 'next/router';
-
-import Snack from 'components/Snack';
-import Head from 'next/head';
-
-import styles from '../../styles/Home.module.css';
 import { Loader } from '@googlemaps/js-api-loader';
+import { CircularProgress } from '@mui/material';
+export interface IMap {
+	lat: string | undefined;
+	lng: string | undefined;
+}
 
-export const Map = () => {
-	const router = useRouter();
+export const Map = ({ lat, lng }: IMap) => {
+	const [loading, setLoading] = React.useState<boolean>(true);
 	const loader = new Loader({
-		apiKey: 'AIzaSyBqDZIerP29cEU5aDDEYACze2c96bTF0ZE',
+		apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
 		version: 'weekly',
 		libraries: ['places'],
 	});
-
-	const mapOptions = {
-		center: {
-			lat: -16.47253,
-			lng: -54.62967,
-		},
-		zoom: 18,
-		fullscreenControl: false,
-		mapTypeControl: false,
-		streetViewControl: false,
-		zoomControl: false,
-	};
 
 	const contentString =
 		'<div id="content">' +
@@ -51,17 +37,27 @@ export const Map = () => {
 		'</div>';
 
 	useEffect(() => {
+		if (lat === undefined || lng === undefined) return;
+		const mapOptions = {
+			center: {
+				lat: parseFloat(lat),
+				lng: parseFloat(lng),
+			},
+			zoom: 18,
+			fullscreenControl: false,
+			mapTypeControl: false,
+			streetViewControl: false,
+			zoomControl: false,
+		};
+		const element = document.getElementById('map');
 		loader
 			.load()
 			.then(google => {
-				const mapp = new google.maps.Map(
-					document.getElementById('map'),
-					mapOptions,
-				);
+				const mapp = new google.maps.Map(element, mapOptions);
 				const marker = new google.maps.Marker({
 					position: {
-						lat: -16.47253,
-						lng: -54.62967,
+						lat: parseFloat(lat),
+						lng: parseFloat(lng),
 					},
 					animation: google.maps.Animation.DROP,
 					map: mapp,
@@ -79,18 +75,22 @@ export const Map = () => {
 				});
 			})
 			.catch(e => {
-				Snack.error('Erro ao carregar mapa ' + e.message);
+				console.error(e);
+			})
+			.finally(() => {
+				setLoading(false);
 			});
-	}, []);
+	}, [lat, lng]);
 	return (
 		<div
 			id="map"
 			style={{
-				display: 'flex',
-				width: 700,
+				width: '100%',
 				height: 415,
 				backgroundColor: '#212529',
 			}}
-		></div>
+		>
+			<CircularProgress />
+		</div>
 	);
 };

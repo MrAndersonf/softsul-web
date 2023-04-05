@@ -19,9 +19,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
 import { EOrder } from 'enums';
 
-import { Add, Edit, FilterList } from '@mui/icons-material';
+import { Add, BadgeRounded, Edit, FilterList } from '@mui/icons-material';
 import { IBranch, IBranchShow } from 'interfaces';
 import { cnpjMask, getComparator } from 'utils';
+import { useRouter } from 'next/router';
+import { Badge } from '@material-ui/core';
 
 function stableSort<T>(
 	array: readonly T[],
@@ -163,6 +165,7 @@ export const BranchsTable = ({
 	onEdit,
 	onDelete,
 }: IBranchsTable) => {
+	const router = useRouter();
 	const [renderer, setRenderer] = React.useState<IBranchShow[]>([]);
 	const [order, setOrder] = React.useState<EOrder>(EOrder.asc);
 	const [orderBy, setOrderBy] = React.useState<keyof IBranchShow>('id');
@@ -178,6 +181,13 @@ export const BranchsTable = ({
 	const handleEdition = () => {
 		const [supplier] = data.filter(el => selected.includes(el.id));
 		onEdit(supplier.id);
+	};
+
+	const handleNavigateToProfile = () => {
+		const branch = data.find(el => el.id === selected[0]);
+		router.push({
+			pathname: `/Branch/${selected[0]}`,
+		});
 	};
 
 	const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
@@ -229,11 +239,19 @@ export const BranchsTable = ({
 							</IconButton>
 						</Tooltip>
 						{numSelected === 1 && (
-							<Tooltip title="Editar" onClick={handleEdition}>
-								<IconButton>
-									<Edit fill="red" />
-								</IconButton>
-							</Tooltip>
+							<>
+								<Tooltip title="Editar" onClick={handleEdition}>
+									<IconButton>
+										<Edit fill="red" />
+									</IconButton>
+								</Tooltip>
+
+								<Tooltip title="Perfil" onClick={handleNavigateToProfile}>
+									<IconButton>
+										<BadgeRounded fill="red" />
+									</IconButton>
+								</Tooltip>
+							</>
 						)}
 					</>
 				) : (
@@ -403,7 +421,15 @@ export const BranchsTable = ({
 											<TableCell align="left">{cnpjMask(cnpj)}</TableCell>
 											<TableCell align="left">{city}</TableCell>
 											<TableCell align="left">{state}</TableCell>
-											<TableCell align="left">{active}</TableCell>
+											<TableCell
+												style={{
+													color: active === 'Ativo' ? '#006241' : 'red',
+													fontWeight: 'bold',
+												}}
+												align="left"
+											>
+												{active}
+											</TableCell>
 										</TableRow>
 									);
 								})}
