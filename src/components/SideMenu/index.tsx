@@ -1,16 +1,6 @@
 import * as React from 'react';
 
-import {
-	Access,
-	Detail,
-	MenuIcon,
-	Hail,
-	HomeIcon,
-	GrassIcon,
-	EventIcon,
-	ScaleIcon,
-	BranchIcon,
-} from '../../icons';
+import { MenuIcon, Hail, HomeIcon, BranchIcon } from '../../icons';
 import List from '@mui/material/List';
 import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
@@ -218,7 +208,7 @@ export const SideMenu = () => {
 						disablePadding
 						button
 						key={'user'}
-						onClick={() => handleNavigate('/user')}
+						onClick={() => handleNavigate('/User')}
 					>
 						<ListItemButton>
 							<ListItemIcon>

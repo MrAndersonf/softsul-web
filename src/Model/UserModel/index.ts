@@ -49,13 +49,14 @@ export class UserModel {
 				password: this._password,
 				active: this._active,
 			};
-			const branch = await axios.post<IUser>('/api/branch', create);
-			if (branch.status === 200) {
-				return branch.data;
+			const user = await axios.post<IUser>('/api/user', create);
+			if (user.status === 200) {
+				return user.data;
 			}
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
+			return false;
 		}
 	}
 
@@ -67,49 +68,53 @@ export class UserModel {
 				password: this._password,
 				active: this._active,
 			};
-			const branch = await axios.put<IUser>(`/api/branch/${id}`, updated);
-			if (branch.status === 200) {
-				return branch.data;
+			const user = await axios.put<IUser>(`/api/user/${id}`, updated);
+			if (user.status === 200) {
+				return user.data;
 			}
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
+			return null;
 		}
 	}
 
 	public static async delete(id: string) {
 		try {
-			const branch = await axios.delete<IUser>(`/api/branch/${id}`);
-			if (branch.status === 200) {
-				return branch.data;
+			const user = await axios.delete<IUser>(`/api/user/${id}`);
+			if (user.status === 200) {
+				return user.data;
 			}
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
+			return false;
 		}
 	}
 
 	public static async all() {
 		try {
-			const branches = await axios<IUser[]>('/api/branch');
-			if (branches.status === 200) {
-				return branches.data;
+			const users = await axios<IUser[]>('/api/user');
+			if (users.status === 200) {
+				return users.data;
 			}
 			return [];
 		} catch (error: any) {
 			Snackbar.error(error.message);
+			return null;
 		}
 	}
 
 	public static async getById(id: string) {
 		try {
-			const branch = await axios<IUser>(`/api/branch/${id}`);
-			if (branch.status === 200) {
-				return branch.data;
+			const user = await axios<IUser>(`/api/user/${id}`);
+			if (user.status === 200) {
+				return user.data;
 			}
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message);
+			return null;
 		}
 	}
 }

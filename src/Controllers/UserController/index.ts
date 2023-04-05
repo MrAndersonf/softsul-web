@@ -1,6 +1,7 @@
 import catchAsyncErrors from '../../middleware/catchAsyncErrors';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from 'Database';
+import { encryptPassword } from 'utils';
 
 const all = catchAsyncErrors(
 	async (req: NextApiRequest, res: NextApiResponse) => {
@@ -8,13 +9,8 @@ const all = catchAsyncErrors(
 			where: { active: true },
 			orderBy: { name: 'asc' },
 		});
-
-		res.status(200).json({
-			status: 'success',
-			data: {
-				user,
-			},
-		});
+		user.map(u => (u.password = ''));
+		res.status(200).json(user);
 	},
 );
 
@@ -26,13 +22,11 @@ const create = catchAsyncErrors(
 				active,
 				name,
 				email,
-				password,
+				password: encryptPassword(password),
 			},
 		});
-		res.status(200).json({
-			status: 'success',
-			data: user,
-		});
+		user.password = '';
+		res.status(200).json(user);
 	},
 );
 
@@ -60,7 +54,9 @@ const getById = catchAsyncErrors(
 				id: id.toString(),
 			},
 		});
-
+		if (user) {
+			user.password = '';
+		}
 		res.status(200).json(user);
 	},
 );
@@ -78,9 +74,10 @@ const update = catchAsyncErrors(
 				active,
 				name,
 				email,
-				password,
+				password: encryptPassword(password),
 			},
 		});
+		user.password = '';
 		res.status(200).json(user);
 	},
 );

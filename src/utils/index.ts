@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 const consultarCNPJ = require('consultar-cnpj');
 
 import React from 'react';
@@ -415,4 +416,12 @@ export const stableSort = <T>(
 		return a[1] - b[1];
 	});
 	return stabilizedThis.map(el => el[0]);
+};
+
+export const encryptPassword = (text: string) => {
+	return bcrypt.hashSync(text, 10);
+};
+
+export const dencryptPassword = (text: string, hash: string) => {
+	return bcrypt.compareSync(text, hash);
 };

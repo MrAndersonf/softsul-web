@@ -1,45 +1,54 @@
-import React, { useState } from 'react';
-
+import React from 'react';
+import * as yup from 'yup';
+import { useFormik } from 'formik';
+import type { NextPage } from 'next';
 import Snack from 'components/Snack';
 import { Main } from 'components/Main';
 import { Form } from 'components/Form';
+import { LoadingButton } from '@mui/lab';
 import { Speed } from 'components/Speed';
-import { Loading } from 'components/Loading';
+import { Search, Visibility, VisibilityOff } from '@mui/icons-material';
+import { IAddress, IBranch, IUser } from 'interfaces';
 import { Selecter } from 'components/Selecter';
 import { PageTag } from 'components/PageTag';
 import { TextInput } from 'components/TextInput';
 import { SideMenu } from 'components/SideMenu';
 
-import * as yup from 'yup';
-import { useFormik } from 'formik';
-import type { NextPage } from 'next';
-import { IBranch } from 'interfaces';
-import { LoadingButton } from '@mui/lab';
-import { Search } from '@mui/icons-material';
 import {
-	Box,
 	Grid,
 	Paper,
 	Modal,
 	Button,
 	Checkbox,
 	FormControlLabel,
+	FormControl,
+	InputLabel,
+	OutlinedInput,
+	InputAdornment,
+	IconButton,
+	FormHelperText,
 } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {
 	states,
 	sanitize,
 	getCNPJ,
-	cepMask,
 	cnpjMask,
 	cepRegex,
 	cnpjRegex,
 	retrieveCitiesByState,
 	truncate,
+	delay,
 } from 'utils';
-import { Add, NewDocument } from 'icons';
-import { useCustomContext } from 'context';
+import { Close, NewDocument, Save } from 'icons';
+
 import { useRouter } from 'next/router';
+import { BranchsTable } from 'components/BranchsTable';
+import { BranchModel } from 'Model/BranchModel';
+import { AddressModel } from 'Model/AddressModel';
+import { Loader } from '@googlemaps/js-api-loader';
+import { Map } from 'components/Map';
+import { UsersTable } from 'components/UsersTable';
+import { UserModel } from 'Model/UserModel';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -48,40 +57,25 @@ const style = {
 	transform: 'translate(-50%, -50%)',
 	margin: 0,
 	padding: 0,
-	minWidth: 360,
+	minWidth: 330,
+	maxWidth: 700,
 };
 
-const Branch: NextPage = () => {
+const User: NextPage = () => {
 	const router = useRouter();
-	const { loading } = useCustomContext();
-	const [id, setId] = useState<string>('');
-	const [list, setList] = useState<IBranch[]>([]);
-	const [load, setLoad] = useState<boolean>(false);
+
+	const [list, setList] = React.useState<IUser[]>([]);
+	const [load, setLoad] = React.useState<boolean>(false);
 	const [open, setOpen] = React.useState(false);
-	const [cities, setCities] = useState<any[]>([]);
+	const [updateUser, setUpdateUser] = React.useState<string>('');
+	const [showPassword, setShowPassword] = React.useState(false);
+
+	const [loadingOnSaving, setLoadingOnSaving] = React.useState<boolean>(false);
 
 	const schema = yup.object().shape({
 		name: yup.string().required('Campo obrigatório'),
-		status: yup.string().required('Campo obrigatório'),
-		fantasy: yup.string().required('Campo obrigatório'),
-		type: yup.string().required('Campo obrigatório'),
-		street: yup.string().required('Campo obrigatório'),
-		zip: yup
-			.string()
-			.required('Campo obrigatório')
-			.matches(cepRegex, 'Formato inválido.'),
-		complement: yup.string().nullable(),
-		neighborhood: yup.string().required('Campo obrigatório'),
-		number: yup.string().required('Campo obrigatório'),
-		city: yup.string().required('Campo obrigatório'),
-		state: yup.string().required('Campo obrigatório'),
-		phone: yup.string().required('Campo obrigatório'),
-
-		cnpj: yup
-			.string()
-			.required('Campo obrigatório')
-			.matches(cnpjRegex, 'Formato inválido')
-			.max(18),
+		email: yup.string().email().required('Campo obrigatório'),
+		password: yup.string().required('Campo obrigatório'),
 		active: yup.boolean(),
 	});
 
@@ -90,112 +84,80 @@ const Branch: NextPage = () => {
 		validateOnBlur: false,
 		validateOnChange: false,
 		initialValues: {
-			status: '',
-			cnpj: '',
-			type: '',
 			name: '',
-			fantasy: '',
-			street: '',
-			number: '',
-			complement: '',
-			zip: '',
-			neighborhood: '',
-			city: '',
-			state: '',
-			phone: '',
+			email: '',
 			active: true,
+			password: '',
 		},
 		onSubmit: async (values, { resetForm }) => {
-			// const newSupplier = new Supplier(values);
-			// if (id !== '') {
-			// 	const edit = await newSupplier.update(id);
-			// 	setList(list.map(el => (el.id === id ? edit : el)));
-			// 	setId('');
-			// 	handleClose();
-			// 	resetForm();
-			// 	return;
-			// }
-			// const created = await newSupplier.create();
-			// setList([...list, created]);
-			// handleClose();
-			// resetForm();
+			try {
+				setLoadingOnSaving(true);
+				const refUser = {
+					id: '',
+					name: values.name,
+					email: values.email,
+					active: values.active,
+					password: values.password,
+				} as IUser;
+
+				const address = new UserModel(refUser);
+
+				if (updateUser !== '') {
+					let updated = await address.update(updateUser);
+
+					if (updated !== null) {
+						const users = list.map(e =>
+							e.id === updateUser && updated !== null ? updated : e,
+						);
+						setList(users);
+						setOpen(false);
+						resetForm();
+						setUpdateUser('');
+						Snack.success('Usuário atualizado com sucesso.');
+						setOpen(false);
+						setLoadingOnSaving(false);
+					}
+				} else {
+					let created = await address.create();
+					if (created) {
+						setList([...list, created]);
+
+						setOpen(false);
+						resetForm();
+						setUpdateUser('');
+						Snack.success('Usuário criado com sucesso.');
+						setOpen(false);
+						setLoadingOnSaving(false);
+					}
+				}
+			} catch (error: any) {
+				Snack.error('Erro ao executar ' + error.message);
+			}
 		},
 	});
 
-	const edit = async (id: string) => {
-		const [supplier] = list.filter(e => e.id === id);
-		// formik.setFieldValue('status', supplier.status);
-		// formik.setFieldValue('cnpj', supplier.cnpj);
-		// formik.setFieldValue('type', supplier.type);
-		// formik.setFieldValue('name', supplier.name);
-		// formik.setFieldValue('fantasy', supplier.fantasy);
-		// formik.setFieldValue('street', supplier.street);
-		// formik.setFieldValue('number', supplier.number);
-		// formik.setFieldValue('complement', supplier.complement);
-		// formik.setFieldValue('zip', supplier.zip);
-		// formik.setFieldValue('neighborhood', supplier.neighborhood);
-		// await handleChangeState(supplier.state);
-		// formik.setFieldValue('city', supplier.city);
-		// formik.setFieldValue('phone', supplier.phone);
-		// formik.setFieldValue('active', supplier.active);
+	const handleClickShowPassword = () => setShowPassword(show => !show);
 
-		setId(id);
+	const handleMouseDownPassword = (
+		event: React.MouseEvent<HTMLButtonElement>,
+	) => {
+		event.preventDefault();
+	};
+
+	const handleBranchsTableOnEdit = async (id: string) => {
+		const [supplier] = list.filter(e => e.id === id);
+		formik.setFieldValue('name', supplier?.name);
+		formik.setFieldValue('email', supplier?.email);
+		formik?.setFieldValue('active', supplier?.active);
+		formik?.setFieldValue('password', supplier?.password);
 		setOpen(true);
 	};
 
-	const handleChangeList = (ids: readonly string[]) => {
+	const handleBranchsTableOnDelete = (ids: readonly string[]) => {
 		setList(list.filter(e => !ids.includes(e.id)));
 	};
 
-	const handleCNPJ = async () => {
-		const { cnpj } = formik.values;
-		try {
-			setLoad(true);
-			const parsedCNPJ = sanitize(cnpj);
-			if (parsedCNPJ.length !== 14) {
-				Snack.warning('O CNPJ precisa conter 14 digitos');
-				return;
-			}
-			const data = await getCNPJ(parsedCNPJ);
-			if (data.estabelecimento.cnpj) {
-				formik.setFieldValue('status', data.estabelecimento.situacao_cadastral);
-				formik.setFieldValue('cnpj', data.estabelecimento.cnpj);
-				formik.setFieldValue('type', data.estabelecimento.tipo);
-				formik.setFieldValue('name', data.razao_social);
-				formik.setFieldValue('fantasy', data.estabelecimento.nome_fantasia);
-				formik.setFieldValue(
-					'street',
-					data.estabelecimento.tipo_logradouro +
-						' ' +
-						data.estabelecimento.logradouro,
-				);
-				formik.setFieldValue('number', data.estabelecimento.numero);
-				formik.setFieldValue('complement', data.estabelecimento.complemento);
-				formik.setFieldValue('zip', data.estabelecimento.cep);
-				formik.setFieldValue('neighborhood', data.estabelecimento.bairro);
-				await handleChangeState(data.estabelecimento.estado.nome);
-				formik.setFieldValue('city', data.estabelecimento.cidade.nome);
-				formik.setFieldValue(
-					'phone',
-					data.estabelecimento.ddd1 + ' ' + data.estabelecimento.telefone1,
-				);
-				setLoad(false);
-				Snack.success('Dados obtidos com sucesso.');
-			} else {
-				setLoad(false);
-				Snack.error(`${truncate(data.detalhes, 20)}`);
-			}
-		} catch (error: any) {
-			setLoad(false);
-			Snack.error(`${truncate(error.detalhes, 20)}`);
-		}
-	};
-
 	const handleChange = async (field: string, value: string | number) => {
-		if (field === 'state') {
-			await handleChangeState(String(value));
-			return;
-		}
 		formik.setFieldValue(field, value);
 	};
 
@@ -205,23 +167,27 @@ const Branch: NextPage = () => {
 	};
 
 	const handleOpen = () => {
-		setId('');
+		setUpdateUser('');
 		setOpen(true);
 	};
 
-	const handleChangeState = async (state: string) => {
-		if (state.length > 2) {
-			const choice = states.filter(el => el.name === state);
-			formik.setFieldValue('state', choice[0]?.name);
-			setCities(await retrieveCitiesByState(choice[0].code));
-			return;
-		}
-		const choice = states.filter(el => el.short === state);
-		formik.setFieldValue('state', choice[0].name);
-		setCities(await retrieveCitiesByState(choice[0].code));
+	const handleCancelCreateOrUpdate = () => {
+		setUpdateUser('');
+		handleClose();
 	};
 
-	React.useEffect(() => {}, []);
+	React.useEffect(() => {
+		(async () => {
+			try {
+				const all = await UserModel.all();
+				if (all !== null) {
+					setList(all);
+				}
+			} catch (error: any) {
+				Snack.error('Erro ao carregar usuários ' + error.message);
+			}
+		})();
+	}, []);
 
 	return (
 		<Main>
@@ -231,11 +197,17 @@ const Branch: NextPage = () => {
 					{
 						exec: handleOpen,
 						icon: <NewDocument />,
-						name: 'Criar Fornecedor',
+						name: 'Criar usuário',
 					},
 				]}
 			/>
 
+			<UsersTable
+				data={list}
+				onEdit={handleBranchsTableOnEdit}
+				label="Usuários"
+				onDelete={handleBranchsTableOnDelete}
+			/>
 			<Modal
 				open={open}
 				onClose={handleClose}
@@ -243,154 +215,147 @@ const Branch: NextPage = () => {
 				aria-describedby="modal-modal-description"
 				closeAfterTransition
 			>
-				<Box sx={style}>
-					<Form onSubmit={formik.handleSubmit}>
-						<Grid
-							container
-							direction="column"
-							elevation={12}
-							component={Paper}
-							minWidth={400}
-						>
-							<Grid item>
-								<PageTag label="Cadastrar Fornecedor" />
-							</Grid>
-							<Grid container item direction="row" spacing={2} padding={1}>
-								<Grid item xs={8} sm={8} md={8} lg={6} xl={6}>
-									<TextInput
-										name="cnpj"
-										value={cnpjMask(formik.values.cnpj)}
-										title="CNPJ do Fornecedor"
-										onChange={handleChange}
-										error={formik.errors.cnpj}
-									/>
+				<div
+					style={{
+						display: 'flex',
+						width: '100%',
+						height: '100vh',
+						flexDirection: 'column',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							maxWidth: 700,
+							minWidth: 330,
+							margin: 10,
+							backgroundColor: '#fff',
+						}}
+					>
+						<Form onSubmit={formik.handleSubmit}>
+							<Grid
+								container
+								direction="column"
+								elevation={12}
+								component={Paper}
+							>
+								<Grid item>
+									<PageTag label="Cadastrar Usuário" />
 								</Grid>
-								<Grid item xs={4} sm={4} md={4} lg={3} xl={2}>
-									<LoadingButton
-										fullWidth
-										loading={load}
-										variant="contained"
-										onClick={handleCNPJ}
-										endIcon={<Search />}
-									>
-										Buscar
-									</LoadingButton>
-								</Grid>
-							</Grid>
-							<Grid container item direction="row" spacing={2} padding={1}>
-								<Grid item xs={12} sm={12} md={12} lg={12} xl={6}>
-									<TextInput
-										name="name"
-										value={formik.values.name}
-										title="Razão Social"
-										onChange={handleChange}
-										error={formik.errors.name}
-									/>
-								</Grid>
+								<Grid container item direction="row" spacing={1} padding={1}>
+									<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+										<TextInput
+											name="name"
+											value={formik.values.name}
+											title="Nome"
+											onChange={handleChange}
+											error={formik.errors.name}
+										/>
+									</Grid>
 
-								<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-									<TextInput
-										name="street"
-										value={formik.values.street}
-										title="Logradouro"
-										onChange={handleChange}
-										error={formik.errors.street}
-									/>
-								</Grid>
-								<Grid item xs={4} sm={4} md={3} lg={3} xl={2}>
-									<TextInput
-										name="number"
-										value={formik.values.number}
-										title="Número"
-										onChange={handleChange}
-										error={formik.errors.number}
-									/>
-								</Grid>
-								<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
-									<TextInput
-										name="complement"
-										value={formik.values.complement}
-										title="Complemento"
-										onChange={handleChange}
-										error={formik.errors.complement}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={5} xl={4}>
-									<Selecter
-										name="state"
-										title="Estado"
-										options={states.map(e => {
-											return { value: e.name, text: e.name };
-										})}
-										error={formik.errors.state}
-										value={formik.values.state}
-										onChange={handleChange}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={12} md={12} lg={7} xl={6}>
-									<Selecter
-										name="city"
-										title="Cidade"
-										options={cities.map(e => {
-											return { text: e.nome, value: e.nome };
-										})}
-										error={formik.errors.city}
-										value={formik.values.city}
-										onChange={handleChange}
-									/>
-								</Grid>
-								<Grid item xs={12} sm={7} md={8} lg={8} xl={6}>
-									<TextInput
-										name="neighborhood"
-										value={formik.values.neighborhood}
-										title="Bairro"
-										onChange={handleChange}
-										error={formik.errors.neighborhood}
-									/>
-								</Grid>
-
-								<Grid item xs={12} sm={5} md={4} lg={4} xl={2}>
-									<TextInput
-										name="zip"
-										value={cepMask(formik.values.zip)}
-										title="CEP"
-										onChange={handleChange}
-										error={formik.errors.zip}
-									/>
-								</Grid>
-
-								<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-									<FormControlLabel
-										control={
-											<Checkbox
-												name="active"
-												checked={formik.values.active}
+									<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+										<TextInput
+											name="email"
+											value={formik.values.email}
+											title="E-mail"
+											onChange={handleChange}
+											error={formik.errors.email}
+										/>
+									</Grid>
+									<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+										<FormControl fullWidth variant="outlined" size="small">
+											<InputLabel htmlFor="outlined-adornment-password">
+												Senha
+											</InputLabel>
+											<OutlinedInput
+												name="password"
+												id="outlined-adornment-password"
+												type={showPassword ? 'text' : 'password'}
+												value={formik.values.password}
 												onChange={formik.handleChange}
+												error={formik.errors.password !== undefined}
+												endAdornment={
+													<InputAdornment position="end">
+														<IconButton
+															aria-label="toggle password visibility"
+															onClick={handleClickShowPassword}
+															onMouseDown={handleMouseDownPassword}
+															edge="end"
+														>
+															{showPassword ? (
+																<VisibilityOff />
+															) : (
+																<Visibility />
+															)}
+														</IconButton>
+													</InputAdornment>
+												}
+												label="Password"
 											/>
-										}
-										label="Ativo"
-									/>
-								</Grid>
-							</Grid>
-							<Grid container item direction="row" spacing={2} padding={1}>
-								<Grid item xs={12} sm={4} md={3} lg={4} xl={4}>
-									<Button
-										fullWidth
-										variant="contained"
-										endIcon={<AddCircleOutlineIcon />}
-										type="submit"
-										onClick={() => formik.handleSubmit}
+											<FormHelperText
+												error={formik.errors.password !== undefined}
+											>
+												{formik.errors.password}
+											</FormHelperText>
+										</FormControl>
+									</Grid>
+
+									<Grid
+										item
+										xs={12}
+										sm={12}
+										md={12}
+										lg={12}
+										xl={12}
+										marginTop={1}
 									>
-										Criar
-									</Button>
+										<FormControlLabel
+											label="Ativo"
+											control={
+												<Checkbox
+													name="active"
+													checked={formik.values.active}
+													onChange={formik.handleChange}
+												/>
+											}
+										/>
+									</Grid>
+									<Grid container item direction="row" spacing={1} padding={1}>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+											<LoadingButton
+												fullWidth
+												loading={loadingOnSaving}
+												type="submit"
+												variant="contained"
+												onClick={() => formik.handleSubmit}
+												endIcon={<Save />}
+											>
+												{updateUser === '' ? 'Cadastrar' : 'Atualizar'}
+											</LoadingButton>
+										</Grid>
+										<Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
+											<Button
+												fullWidth
+												color="error"
+												variant="contained"
+												endIcon={<Close />}
+												onClick={handleCancelCreateOrUpdate}
+											>
+												Cancelar
+											</Button>
+										</Grid>
+									</Grid>
 								</Grid>
 							</Grid>
-						</Grid>
-					</Form>
-				</Box>
+						</Form>
+					</div>
+				</div>
 			</Modal>
 		</Main>
 	);
 };
 
-export default Branch;
+export default User;

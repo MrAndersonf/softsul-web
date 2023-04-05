@@ -1,49 +1,42 @@
-import React, { useState } from 'react';
-import axios from 'service/axios';
+import React from 'react';
+import * as yup from 'yup';
+import { useFormik } from 'formik';
+import type { NextPage } from 'next';
 import Snack from 'components/Snack';
 import { Main } from 'components/Main';
 import { Form } from 'components/Form';
+import { LoadingButton } from '@mui/lab';
 import { Speed } from 'components/Speed';
-import { Loading } from 'components/Loading';
+import { Search } from '@mui/icons-material';
+import { IAddress, IBranch } from 'interfaces';
 import { Selecter } from 'components/Selecter';
 import { PageTag } from 'components/PageTag';
 import { TextInput } from 'components/TextInput';
 import { SideMenu } from 'components/SideMenu';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
 
-import * as yup from 'yup';
-import { useFormik } from 'formik';
-import type { NextPage } from 'next';
-import { IAddress, IBranch } from 'interfaces';
-import { LoadingButton } from '@mui/lab';
-import { Search } from '@mui/icons-material';
 import {
-	Box,
 	Grid,
 	Paper,
 	Modal,
 	Button,
 	Checkbox,
 	FormControlLabel,
-	Tab,
 } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {
 	states,
 	sanitize,
 	getCNPJ,
-	cepMask,
 	cnpjMask,
 	cepRegex,
 	cnpjRegex,
 	retrieveCitiesByState,
 	truncate,
 	delay,
+	encryptPassword,
+	dencryptPassword,
 } from 'utils';
-import { Add, Close, NewDocument, Save } from 'icons';
-import { useCustomContext } from 'context';
+import { Close, NewDocument, Save } from 'icons';
+
 import { useRouter } from 'next/router';
 import { BranchsTable } from 'components/BranchsTable';
 import { BranchModel } from 'Model/BranchModel';
@@ -65,23 +58,17 @@ const style = {
 const Branch: NextPage = () => {
 	const router = useRouter();
 
-	const [id, setId] = useState<string>('');
-	const [updateAddress, setUpdateAddress] = useState<string>('');
-	const [updateBranch, setUpdateBranch] = useState<string>('');
-	const [list, setList] = useState<IBranch[]>([]);
-	const [load, setLoad] = useState<boolean>(false);
-	const [loadingOnSaving, setLoadingOnSaving] = useState<boolean>(false);
+	const [id, setId] = React.useState<string>('');
+	const [list, setList] = React.useState<IBranch[]>([]);
+	const [load, setLoad] = React.useState<boolean>(false);
 	const [open, setOpen] = React.useState(false);
-	const [cities, setCities] = useState<any[]>([]);
-	const [value, setValue] = React.useState('1');
-
-	const handleChangeTab = (event: React.SyntheticEvent, newValue: string) => {
-		setValue(newValue);
-	};
+	const [cities, setCities] = React.useState<any[]>([]);
+	const [updateBranch, setUpdateBranch] = React.useState<string>('');
+	const [updateAddress, setUpdateAddress] = React.useState<string>('');
+	const [loadingOnSaving, setLoadingOnSaving] = React.useState<boolean>(false);
 
 	const schema = yup.object().shape({
 		name: yup.string().required('Campo obrigatório'),
-
 		street: yup.string().required('Campo obrigatório'),
 		zip: yup
 			.string()
@@ -111,17 +98,14 @@ const Branch: NextPage = () => {
 		initialValues: {
 			status: '',
 			cnpj: '',
-
 			name: '',
-
 			street: '',
 			number: '',
 			complement: '',
-			zipcode: '',
+			zip: '',
 			neighborhood: '',
 			city: '',
 			state: '',
-
 			active: true,
 			lat: '',
 			long: '',
@@ -139,7 +123,7 @@ const Branch: NextPage = () => {
 					number: values.number,
 					state: values.state,
 					street: values.street,
-					zipcode: values.zipcode,
+					zipcode: values.zip,
 					reference: values.reference,
 				} as IAddress;
 
@@ -191,20 +175,20 @@ const Branch: NextPage = () => {
 		const [supplier] = list.filter(e => e.id === id);
 		formik.setFieldValue('cnpj', supplier.cnpj);
 		formik.setFieldValue('name', supplier.name);
-		formik.setFieldValue('street', supplier.address.street);
-		formik.setFieldValue('number', supplier.address.number);
-		formik.setFieldValue('complement', supplier.address.complement);
-		formik.setFieldValue('zip', supplier.address.zipcode);
-		formik.setFieldValue('neighborhood', supplier.address.neighborhood);
-		await handleChangeState(supplier.address.state);
-		formik.setFieldValue('city', supplier.address.city);
-		formik.setFieldValue('active', supplier.active);
+		formik.setFieldValue('street', supplier?.address?.street);
+		formik.setFieldValue('number', supplier?.address?.number);
+		formik.setFieldValue('complement', supplier?.address?.complement);
+		formik.setFieldValue('zip', supplier?.address?.zipcode);
+		formik.setFieldValue('neighborhood', supplier?.address?.neighborhood);
+		await handleChangeState(supplier?.address?.state);
+		formik?.setFieldValue('city', supplier?.address?.city);
+		formik?.setFieldValue('active', supplier?.active);
 		formik.setFieldValue('lat', supplier?.lat);
 		formik.setFieldValue('long', supplier?.long);
 		formik.setFieldValue('email', supplier?.email);
 		formik.setFieldValue('reference', supplier?.address?.reference ?? '');
-		setUpdateBranch(supplier.id);
-		setUpdateAddress(supplier.address.id);
+		setUpdateBranch(supplier?.id);
+		setUpdateAddress(supplier?.address?.id);
 
 		setOpen(true);
 	};
@@ -226,11 +210,10 @@ const Branch: NextPage = () => {
 			}
 			const data = await getCNPJ(parsedCNPJ);
 			if (data.estabelecimento.cnpj) {
-				formik.setFieldValue('status', data.estabelecimento.situacao_cadastral);
 				formik.setFieldValue('cnpj', data.estabelecimento.cnpj);
-				formik.setFieldValue('type', data.estabelecimento.tipo);
+
 				formik.setFieldValue('name', data.razao_social);
-				formik.setFieldValue('fantasy', data.estabelecimento.nome_fantasia);
+
 				formik.setFieldValue(
 					'street',
 					data.estabelecimento.tipo_logradouro +
@@ -278,10 +261,10 @@ const Branch: NextPage = () => {
 	};
 
 	const handleChangeState = async (state: string) => {
-		if (state.length > 2) {
-			const choice = states.filter(el => el.name === state);
+		if (state?.length > 2) {
+			const choice = states.filter(el => el?.name === state);
 			formik.setFieldValue('state', choice[0]?.name);
-			setCities(await retrieveCitiesByState(choice[0].code));
+			setCities(await retrieveCitiesByState(choice[0]?.code));
 			return;
 		}
 		const choice = states.filter(el => el.short === state);
@@ -298,6 +281,7 @@ const Branch: NextPage = () => {
 		(async () => {
 			try {
 				const all = await BranchModel.all();
+
 				if (all !== undefined) {
 					setList(all);
 				}

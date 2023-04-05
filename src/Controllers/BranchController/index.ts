@@ -29,6 +29,7 @@ const create = catchAsyncErrors(
 				long,
 				active,
 			},
+			select: {},
 		});
 		res.status(200).json(address);
 	},
@@ -82,6 +83,7 @@ const update = catchAsyncErrors(
 				long,
 				active,
 			},
+			include: { address: true },
 		});
 		res.status(200).json(address);
 	},

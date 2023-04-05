@@ -12,6 +12,14 @@ export interface IUser {
 	active: boolean;
 }
 
+export interface IUserShow {
+	id: string;
+	position: number;
+	name: string;
+	email: string;
+	active: string;
+}
+
 export interface IBranch {
 	id: string;
 	name: string;
