@@ -4,11 +4,6 @@ import { Main } from 'components/Main';
 
 import { SideMenu } from 'components/SideMenu';
 
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import EmailIcon from '@mui/icons-material/Email';
-import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-
 import type { NextPage } from 'next';
 import { IBranch } from 'interfaces';
 
@@ -23,81 +18,107 @@ import {
 	BranchInfo,
 	Container,
 	Desc,
+	LoadArea,
+	LoadMain,
+	LoadMessage,
 	Status,
 	Title,
 	TitleArea,
 	Topic,
 } from 'styles/Profile/style';
+import { Apartment, Eletric, EmailIcon, Finger, Location } from 'icons';
+import { cnpjMask, delay } from 'utils';
+import { CircularProgress } from '@material-ui/core';
 
 const Profile: NextPage = () => {
 	const router = useRouter();
+	const [loading, setLoading] = React.useState(true);
 	const [branch, setBranch] = React.useState<IBranch | null>(null);
 	const id = router.query.id as string;
 
 	React.useEffect(() => {
 		(async () => {
+			await delay(1000);
 			const profile = await BranchModel.getById(id);
 			if (profile) {
 				setBranch(profile);
 			}
+			setLoading(false);
 		})();
 	}, [id]);
-	console.log(branch);
+
 	return (
 		<Main>
 			<SideMenu />
 			<Container>
-				<Grid container direction="column" component={'div'}>
-					<Grid container item direction="row" spacing={1} padding={1}>
-						<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-							<BranchInfo>
-								<Topic>
-									<TitleArea>
-										<ApartmentIcon />
-										<Title>Nome</Title>
-									</TitleArea>
-									<Desc>{branch?.name}</Desc>
-								</Topic>
-								<Topic>
-									<TitleArea>
-										<FingerprintIcon />
-										<Title>CNPJ</Title>
-									</TitleArea>
-									<Desc>{branch?.cnpj}</Desc>
-								</Topic>
-								<Topic>
-									<TitleArea>
-										<EmailIcon />
-										<Title>Contato</Title>
-									</TitleArea>
-									<Desc>{branch?.email}</Desc>
-								</Topic>
+				{!loading ? (
+					<Grid container direction="column" component={'div'}>
+						<Grid container item direction="row" spacing={1} padding={1}>
+							<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+								{!loading ? (
+									<BranchInfo>
+										<Topic>
+											<TitleArea>
+												<Apartment />
+												<Title>Nome</Title>
+											</TitleArea>
+											<Desc>{branch?.name}</Desc>
+										</Topic>
+										<Topic>
+											<TitleArea>
+												<Finger />
+												<Title>CNPJ</Title>
+											</TitleArea>
+											<Desc>{cnpjMask(branch?.cnpj)}</Desc>
+										</Topic>
+										<Topic>
+											<TitleArea>
+												<EmailIcon />
+												<Title>Contato</Title>
+											</TitleArea>
+											<Desc>{branch?.email}</Desc>
+										</Topic>
 
-								<Topic>
-									<TitleArea>
-										<EmailIcon />
-										<Title>Status</Title>
-									</TitleArea>
-									<Status active={branch?.active}>
-										{branch?.active ? 'Ativo' : 'Inativo'}
-									</Status>
-								</Topic>
-								<Topic>
-									<TitleArea>
-										<LocationOnIcon />
-										<Title>Endereço</Title>
-									</TitleArea>
-									<Desc>{`${branch?.address?.street} ${branch?.address?.number}, ${branch?.address?.neighborhood}`}</Desc>
-									<Desc>{`${branch?.address?.zipcode} ${branch?.address?.city} - ${branch?.address?.state}`}</Desc>
-								</Topic>
-							</BranchInfo>
-						</Grid>
+										<Topic>
+											<TitleArea>
+												<Eletric />
+												<Title>Status</Title>
+											</TitleArea>
+											<Status active={branch?.active}>
+												{branch?.active ? 'Ativo' : 'Inativo'}
+											</Status>
+										</Topic>
+										<Topic>
+											<TitleArea>
+												<Location />
+												<Title>Endereço</Title>
+											</TitleArea>
+											<Desc>{`${branch?.address?.street} ${branch?.address?.number}, ${branch?.address?.neighborhood}`}</Desc>
+											<Desc>{`${branch?.address?.zipcode} ${branch?.address?.city} - ${branch?.address?.state}`}</Desc>
+										</Topic>
+									</BranchInfo>
+								) : (
+									<CircularProgress />
+								)}
+							</Grid>
 
-						<Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-							<Map lat={branch?.lat} lng={branch?.long} />
+							<Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+								<Map lat={branch?.lat} lng={branch?.long} />
+							</Grid>
 						</Grid>
 					</Grid>
-				</Grid>
+				) : (
+					<LoadArea>
+						<LoadMain>
+							<CircularProgress
+								color="inherit"
+								style={{ color: '#fff' }}
+								title="Carregando"
+							/>
+							<LoadMessage>Carregando</LoadMessage>
+						</LoadMain>
+					</LoadArea>
+				)}
 			</Container>
 		</Main>
 	);

@@ -33,11 +33,40 @@ import { PictureAsPdf } from '@mui/icons-material';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import Cached from '@mui/icons-material/Cached';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import EmailIc from '@mui/icons-material/Email';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 
 interface IICons {
 	color?: string;
 	size?: number;
 }
+
+export const Eletric = ({ color, size }: IICons) => {
+	return (
+		<ElectricBoltIcon sx={{ fontSize: size || 22, color: color || null }} />
+	);
+};
+
+export const Location = ({ color, size }: IICons) => {
+	return <LocationOnIcon sx={{ fontSize: size || 22, color: color || null }} />;
+};
+
+export const Finger = ({ color, size }: IICons) => {
+	return (
+		<FingerprintIcon sx={{ fontSize: size || 22, color: color || null }} />
+	);
+};
+
+export const EmailIcon = ({ color, size }: IICons) => {
+	return <EmailIc sx={{ fontSize: size || 22, color: color || null }} />;
+};
+
+export const Apartment = ({ color, size }: IICons) => {
+	return <ApartmentIcon sx={{ fontSize: size || 22, color: color || null }} />;
+};
 
 export const Add = ({ color, size }: IICons) => {
 	return <AddIcon sx={{ fontSize: size || 22, color: color || null }} />;

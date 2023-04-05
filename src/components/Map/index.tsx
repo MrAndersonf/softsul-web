@@ -9,7 +9,7 @@ export interface IMap {
 export const Map = ({ lat, lng }: IMap) => {
 	const [loading, setLoading] = React.useState<boolean>(true);
 	const loader = new Loader({
-		apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+		apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
 		version: 'weekly',
 		libraries: ['places'],
 	});
@@ -44,10 +44,10 @@ export const Map = ({ lat, lng }: IMap) => {
 				lng: parseFloat(lng),
 			},
 			zoom: 18,
-			fullscreenControl: false,
-			mapTypeControl: false,
-			streetViewControl: false,
-			zoomControl: false,
+			fullscreenControl: true,
+			mapTypeControl: true,
+			streetViewControl: true,
+			zoomControl: true,
 		};
 		const element = document.getElementById('map');
 		loader
@@ -86,7 +86,7 @@ export const Map = ({ lat, lng }: IMap) => {
 			id="map"
 			style={{
 				width: '100%',
-				height: 415,
+				height: '90vh',
 				backgroundColor: '#212529',
 			}}
 		>
