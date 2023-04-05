@@ -52,6 +52,8 @@ export const ContextProvider = ({ children }: IContextProvider) => {
 	};
 
 	const signOut = async () => {
+		localStorage.removeItem('email');
+		localStorage.removeItem('name');
 		setEmail(null);
 		setName(null);
 		setSigned(false);

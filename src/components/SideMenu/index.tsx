@@ -22,6 +22,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { AccountCircle, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Menu, MenuItem } from '@mui/material';
+import { useCustomContext } from 'context';
 
 const drawerWidth = 300;
 
@@ -56,6 +57,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export const SideMenu = () => {
 	const router = useRouter();
+	const { signOut, name } = useCustomContext();
 	const theme = useTheme();
 	const [open, setOpen] = React.useState(false);
 
@@ -87,8 +89,6 @@ export const SideMenu = () => {
 		setOpen(false);
 	};
 
-	const opts = [];
-
 	return (
 		<Box
 			sx={{
@@ -105,7 +105,7 @@ export const SideMenu = () => {
 					flexDirection: 'row',
 					justifyContent: 'space-between',
 					alignItems: 'center',
-					backgroundColor: 'black',
+					backgroundColor: '#49514E',
 				}}
 			>
 				<Toolbar>
@@ -124,15 +124,7 @@ export const SideMenu = () => {
 						component="div"
 						style={{ color: '#fff' }}
 					>
-						Centro
-					</Typography>
-					<Typography
-						variant="h6"
-						noWrap
-						component="div"
-						style={{ color: 'gold' }}
-					>
-						pool
+						Softsul Sistemas
 					</Typography>
 				</Toolbar>
 
@@ -162,9 +154,11 @@ export const SideMenu = () => {
 						open={Boolean(anchorEl)}
 						onClose={handleClose}
 					>
-						<MenuItem onClick={handleClose}>{'Anderson'}</MenuItem>
+						<MenuItem onClick={handleClose}>{name}</MenuItem>
 						<Divider></Divider>
-						<MenuItem style={{ color: 'red' }}>Sair</MenuItem>
+						<MenuItem onClick={signOut} style={{ color: 'red' }}>
+							Sair
+						</MenuItem>
 					</Menu>
 				</div>
 			</AppBar>
