@@ -56,6 +56,7 @@ const getById = catchAsyncErrors(
 			where: {
 				id: id.toString(),
 			},
+			include: { address: true },
 		});
 		res.status(200).json(branch);
 	},

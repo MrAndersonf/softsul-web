@@ -1,66 +1,33 @@
 import React, { useState } from 'react';
-import axios from 'service/axios';
-import Snack from 'components/Snack';
+
 import { Main } from 'components/Main';
-import { Form } from 'components/Form';
-import { Speed } from 'components/Speed';
-import { Loading } from 'components/Loading';
-import { Selecter } from 'components/Selecter';
-import { PageTag } from 'components/PageTag';
-import { TextInput } from 'components/TextInput';
+
 import { SideMenu } from 'components/SideMenu';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
 
-import * as yup from 'yup';
-import { useFormik } from 'formik';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import EmailIcon from '@mui/icons-material/Email';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+
 import type { NextPage } from 'next';
-import { IAddress, IBranch } from 'interfaces';
-import { LoadingButton } from '@mui/lab';
-import { Search } from '@mui/icons-material';
-import {
-	Box,
-	Grid,
-	Paper,
-	Modal,
-	Button,
-	Checkbox,
-	FormControlLabel,
-	Tab,
-} from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import {
-	states,
-	sanitize,
-	getCNPJ,
-	cnpjMask,
-	cepRegex,
-	cnpjRegex,
-	retrieveCitiesByState,
-	truncate,
-	delay,
-} from 'utils';
-import { Add, Close, NewDocument, Save } from 'icons';
-import { useCustomContext } from 'context';
-import { useRouter } from 'next/router';
-import { BranchsTable } from 'components/BranchsTable';
-import { BranchModel } from 'Model/BranchModel';
-import { AddressModel } from 'Model/AddressModel';
-import { Loader } from '@googlemaps/js-api-loader';
-import { Map } from 'components/Map';
-import { Container } from 'styles/Profile/style';
+import { IBranch } from 'interfaces';
 
-const style = {
-	position: 'absolute' as 'absolute',
-	top: '50%',
-	left: '50%',
-	transform: 'translate(-50%, -50%)',
-	margin: 0,
-	padding: 0,
-	minWidth: 330,
-	maxWidth: 700,
-};
+import { Grid } from '@mui/material';
+
+import { useRouter } from 'next/router';
+
+import { BranchModel } from 'Model/BranchModel';
+
+import { Map } from 'components/Map';
+import {
+	BranchInfo,
+	Container,
+	Desc,
+	Status,
+	Title,
+	TitleArea,
+	Topic,
+} from 'styles/Profile/style';
 
 const Profile: NextPage = () => {
 	const router = useRouter();
@@ -83,10 +50,50 @@ const Profile: NextPage = () => {
 				<Grid container direction="column" component={'div'}>
 					<Grid container item direction="row" spacing={1} padding={1}>
 						<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-							
+							<BranchInfo>
+								<Topic>
+									<TitleArea>
+										<ApartmentIcon />
+										<Title>Nome</Title>
+									</TitleArea>
+									<Desc>{branch?.name}</Desc>
+								</Topic>
+								<Topic>
+									<TitleArea>
+										<FingerprintIcon />
+										<Title>CNPJ</Title>
+									</TitleArea>
+									<Desc>{branch?.cnpj}</Desc>
+								</Topic>
+								<Topic>
+									<TitleArea>
+										<EmailIcon />
+										<Title>Contato</Title>
+									</TitleArea>
+									<Desc>{branch?.email}</Desc>
+								</Topic>
+
+								<Topic>
+									<TitleArea>
+										<EmailIcon />
+										<Title>Status</Title>
+									</TitleArea>
+									<Status active={branch?.active}>
+										{branch?.active ? 'Ativo' : 'Inativo'}
+									</Status>
+								</Topic>
+								<Topic>
+									<TitleArea>
+										<LocationOnIcon />
+										<Title>Endereço</Title>
+									</TitleArea>
+									<Desc>{`${branch?.address?.street} ${branch?.address?.number}, ${branch?.address?.neighborhood}`}</Desc>
+									<Desc>{`${branch?.address?.zipcode} ${branch?.address?.city} - ${branch?.address?.state}`}</Desc>
+								</Topic>
+							</BranchInfo>
 						</Grid>
 
-						<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+						<Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
 							<Map lat={branch?.lat} lng={branch?.long} />
 						</Grid>
 					</Grid>
