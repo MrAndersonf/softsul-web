@@ -48,6 +48,8 @@ import { useRouter } from 'next/router';
 import { BranchsTable } from 'components/BranchsTable';
 import { BranchModel } from 'Model/BranchModel';
 import { AddressModel } from 'Model/AddressModel';
+import { Loader } from '@googlemaps/js-api-loader';
+import { Map } from 'components/Map';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -178,6 +180,58 @@ const Branch: NextPage = () => {
 		},
 	});
 
+	const handleRenderMap = async (lat: string, long: string) => {
+		const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+		const element = document.getElementById('map');
+		console.log(element);
+		if (key === undefined) return;
+		const loader = new Loader({
+			apiKey: key,
+			version: 'weekly',
+			libraries: ['places'],
+		});
+
+		const mapOptions = {
+			center: {
+				lat: lat,
+				lng: long,
+			},
+			zoom: 18,
+			fullscreenControl: false,
+			mapTypeControl: false,
+			streetViewControl: false,
+			zoomControl: false,
+		};
+
+		loader
+			.load()
+			.then(google => {
+				const mapp = new google.maps.Map(element, mapOptions);
+				const marker = new google.maps.Marker({
+					position: {
+						lat: lat,
+						lng: long,
+					},
+					animation: google.maps.Animation.DROP,
+					map: mapp,
+					title: 'Centropool',
+				});
+				const infowindow = new google.maps.InfoWindow({
+					content: contentString,
+					ariaLabel: 'Centropool',
+				});
+				marker.addListener('click', () => {
+					infowindow.open({
+						anchor: marker,
+						mapp,
+					});
+				});
+			})
+			.catch(e => {
+				console.log(e);
+			});
+	};
+
 	const handleBranchsTableOnEdit = async (id: string) => {
 		const [supplier] = list.filter(e => e.id === id);
 		formik.setFieldValue('cnpj', supplier.cnpj);
@@ -196,6 +250,8 @@ const Branch: NextPage = () => {
 		formik.setFieldValue('reference', supplier?.address?.reference ?? '');
 		setUpdateBranch(supplier.id);
 		setUpdateAddress(supplier.address.id);
+		await handleRenderMap(supplier.lat, supplier.long);
+
 		setOpen(true);
 	};
 
@@ -284,6 +340,28 @@ const Branch: NextPage = () => {
 		handleClose();
 	};
 
+	const contentString =
+		'<div id="content">' +
+		'<div id="siteNotice">' +
+		'</div>' +
+		'<h1 id="firstHeading" class="firstHeading">Centropool</h1>' +
+		'<div id="bodyContent">' +
+		'<p><b>Centropool Assessoria em Agronegócios</b>, está localizada na Rua Arnaldo ' +
+		'Estevão de Figueiredo, 164 - Centro, Rondonópolis - MT. <br />' +
+		+'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
+		'south west of the nearest large town, Alice Springs; 450&#160;km ' +
+		'(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
+		'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
+		'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
+		'Aboriginal people of the area. It has many springs, waterholes, ' +
+		'rock caves and ancient paintings. Uluru is listed as a World ' +
+		'Heritage Site.</p>' +
+		'<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+		'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
+		'(last visited June 22, 2009).</p>' +
+		'</div>' +
+		'</div>';
+
 	React.useEffect(() => {
 		(async () => {
 			try {
@@ -296,8 +374,6 @@ const Branch: NextPage = () => {
 			}
 		})();
 	}, []);
-
-	console.log(formik.errors);
 
 	return (
 		<Main>
@@ -561,186 +637,14 @@ const Branch: NextPage = () => {
 								</Form>
 							</TabPanel>
 							<TabPanel style={{ backgroundColor: '#fff' }} value="3">
-								<Form onSubmit={formik.handleSubmit}>
-									<Grid container direction="column" component={'div'}>
-										<Grid
-											container
-											item
-											direction="row"
-											spacing={1}
-											padding={1}
-										>
-											<Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
-												<TextInput
-													name="cnpj"
-													value={cnpjMask(formik.values.cnpj)}
-													title="CNPJ do Fornecedor"
-													onChange={handleChange}
-													error={formik.errors.cnpj}
-												/>
-											</Grid>
-											<Grid item xs={4} sm={4} md={4} lg={4} xl={2}>
-												<LoadingButton
-													fullWidth
-													loading={load}
-													variant="contained"
-													onClick={handleCNPJ}
-													endIcon={<Search />}
-												>
-													Buscar
-												</LoadingButton>
-											</Grid>
-										</Grid>
-										<Grid
-											container
-											item
-											direction="row"
-											spacing={1}
-											padding={1}
-										>
-											<Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
-												<TextInput
-													name="name"
-													value={formik.values.name}
-													title="Razão Social"
-													onChange={handleChange}
-													error={formik.errors.name}
-												/>
-											</Grid>
-											<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
-												<TextInput
-													name="zipcode"
-													value={cepMask(formik.values.zipcode)}
-													title="CEP"
-													onChange={handleChange}
-													error={formik.errors.zipcode}
-												/>
-											</Grid>
-
-											<Grid item xs={8} sm={8} md={9} lg={9} xl={8}>
-												<TextInput
-													name="street"
-													value={formik.values.street}
-													title="Logradouro"
-													onChange={handleChange}
-													error={formik.errors.street}
-												/>
-											</Grid>
-											<Grid item xs={4} sm={4} md={3} lg={3} xl={4}>
-												<TextInput
-													name="number"
-													value={formik.values.number}
-													title="Número"
-													onChange={handleChange}
-													error={formik.errors.number}
-												/>
-											</Grid>
-											<Grid item xs={8} sm={8} md={9} lg={9} xl={6}>
-												<TextInput
-													name="complement"
-													value={formik.values.complement}
-													title="Complemento"
-													onChange={handleChange}
-													error={formik.errors.complement}
-												/>
-											</Grid>
-											<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-												<TextInput
-													name="neighborhood"
-													value={formik.values.neighborhood}
-													title="Bairro"
-													onChange={handleChange}
-													error={formik.errors.neighborhood}
-												/>
-											</Grid>
-											<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-												<Selecter
-													name="state"
-													title="Estado"
-													options={states.map(e => {
-														return { value: e.name, text: e.name };
-													})}
-													error={formik.errors.state}
-													value={formik.values.state}
-													onChange={handleChange}
-												/>
-											</Grid>
-											<Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
-												<Selecter
-													name="city"
-													title="Cidade"
-													options={cities.map(e => {
-														return { text: e.nome, value: e.nome };
-													})}
-													error={formik.errors.city}
-													value={formik.values.city}
-													onChange={handleChange}
-												/>
-											</Grid>
-
-											<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
-												<TextInput
-													name="lat"
-													value={formik.values.lat}
-													title="Latitude"
-													onChange={handleChange}
-													error={formik.errors.lat}
-												/>
-											</Grid>
-											<Grid item xs={6} sm={6} md={6} lg={3} xl={4}>
-												<TextInput
-													name="long"
-													value={formik.values.long}
-													title="Longitude"
-													onChange={handleChange}
-													error={formik.errors.long}
-												/>
-											</Grid>
-
-											<Grid item xs={12} sm={12} md={12} lg={12} xl={4}>
-												<FormControlLabel
-													control={
-														<Checkbox
-															name="active"
-															checked={formik.values.active}
-															onChange={formik.handleChange}
-														/>
-													}
-													label="Ativo"
-												/>
-											</Grid>
-										</Grid>
-										<Grid
-											container
-											item
-											direction="row"
-											spacing={1}
-											padding={1}
-										>
-											<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
-												<Button
-													fullWidth
-													variant="contained"
-													endIcon={<AddCircleOutlineIcon />}
-													onClick={formik.submitForm}
-												>
-													{id === '' ? 'Cadastrar' : 'Atualizar'}
-												</Button>
-											</Grid>
-											<Grid item xs={6} sm={6} md={6} lg={6} xl={4}>
-												<Button
-													fullWidth
-													color="error"
-													variant="contained"
-													endIcon={<Close />}
-													onClick={handleCancelCreateOrUpdate}
-												>
-													Cancelar
-												</Button>
-											</Grid>
-										</Grid>
-									</Grid>
-								</Form>
+								<div
+									style={{
+										display: 'flex',
+										width: '100%',
+									}}
+								>
+									<Map />
+								</div>
 							</TabPanel>
 						</TabContext>
 					</div>
