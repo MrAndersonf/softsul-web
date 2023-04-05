@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import CloseIcon from '@mui/icons-material/Close';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import SaveIcon from '@mui/icons-material/Save';
@@ -206,4 +206,8 @@ export const BranchIcon = ({ color, size }: IICons) => {
 	return (
 		<AddBusinessIcon sx={{ fontSize: size || 22, color: color || null }} />
 	);
+};
+
+export const Lock = ({ color, size }: IICons) => {
+	return <LockOpenIcon sx={{ fontSize: size || 22, color: color || null }} />;
 };

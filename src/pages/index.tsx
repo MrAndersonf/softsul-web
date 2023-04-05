@@ -165,8 +165,12 @@ const Login: NextPage = () => {
 				</Controls>
 
 				<LoadingButton
+					fullWidth
+					sx={{ fontSize: 13 }}
 					loading={loading}
 					variant="contained"
+					loadingPosition="start"
+					startIcon={<Lock />}
 					onClick={() => {
 						formik.handleSubmit();
 					}}
