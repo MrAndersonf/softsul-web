@@ -1,15 +1,16 @@
 import React from 'react';
-import { LoadingArea } from './style';
+import { LoadingArea, LoadMain, LoadMessage } from './style';
 import { Main } from 'components/Main';
 import { CircularProgress } from '@mui/material';
-import { SideMenu } from 'components/SideMenu';
 
 export const Loading = () => {
 	return (
 		<Main>
-			<SideMenu />
 			<LoadingArea>
-				<CircularProgress />
+				<LoadMain>
+					<CircularProgress style={{ color: '#fff' }} />
+					<LoadMessage>Redirecionando</LoadMessage>
+				</LoadMain>
 			</LoadingArea>
 		</Main>
 	);

@@ -49,6 +49,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Map } from 'components/Map';
 import { UsersTable } from 'components/UsersTable';
 import { UserModel } from 'Model/UserModel';
+import { useCustomContext } from 'context';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -63,7 +64,7 @@ const style = {
 
 const User: NextPage = () => {
 	const router = useRouter();
-
+	const { signed, loading } = useCustomContext();
 	const [list, setList] = React.useState<IUser[]>([]);
 	const [load, setLoad] = React.useState<boolean>(false);
 	const [open, setOpen] = React.useState(false);
@@ -177,6 +178,9 @@ const User: NextPage = () => {
 	};
 
 	React.useEffect(() => {
+		if (!signed && !loading) {
+			router.push('/login');
+		}
 		(async () => {
 			try {
 				const all = await UserModel.all();

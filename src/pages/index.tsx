@@ -25,6 +25,7 @@ import { NextPage } from 'next';
 import Image from 'next/image';
 import { useCustomContext } from 'context';
 import { useRouter } from 'next/router';
+import { Loading } from 'components/Loading';
 
 const Login: NextPage = () => {
 	const router = useRouter();
@@ -82,102 +83,116 @@ const Login: NextPage = () => {
 		setVisible(!visible);
 	};
 
+	React.useEffect(() => {
+		if (signed && !loading) {
+			router.push('/Branch');
+		}
+	}, [signed, loading, router]);
+
 	return (
 		<Container>
-			<Form onSubmit={formik.handleSubmit}>
-				<Company>
-					<Image src={Logo} alt="Logo" width={160} height={120} />
-				</Company>
+			{!loading && !signed ? (
+				<Form onSubmit={formik.handleSubmit}>
+					<Company>
+						<Image src={Logo} alt="Logo" width={160} height={120} />
+					</Company>
 
-				<TextField
-					onBlur={() => handleFocus('')}
-					onFocus={() => handleFocus('email')}
-					name="email"
-					sx={{ width: 330, marginBottom: 3 }}
-					label="Usuário"
-					value={formik.values.email}
-					onChange={formik.handleChange}
-					helperText={formik.errors.email}
-					error={formik.errors.email !== undefined}
-					InputProps={{
-						startAdornment: (
-							<InputAdornment position="start">
-								<AccountCircle
-									color={focused === 'email' ? 'primary' : 'inherit'}
-								/>
-							</InputAdornment>
-						),
-					}}
-					variant="standard"
-				/>
-				<TextField
-					onBlur={() => handleFocus('')}
-					onFocus={() => handleFocus('password')}
-					name="password"
-					type={visible ? 'text' : 'password'}
-					sx={{ width: 330, marginBottom: 3 }}
-					helperText={formik.errors.password}
-					onChange={formik.handleChange}
-					error={formik.errors.password !== undefined}
-					label="Senha"
-					value={formik.values.password}
-					InputProps={{
-						startAdornment: (
-							<InputAdornment position="start">
-								<Lock color={focused === 'password' ? 'primary' : 'inherit'} />
-							</InputAdornment>
-						),
-						endAdornment: (
-							<InputAdornment
-								position="start"
-								onClick={handleView}
-								style={{ cursor: 'pointer' }}
-							>
-								{!visible ? (
-									<VisibilityOff color="error" />
-								) : (
-									<Visibility color="error" />
-								)}
-							</InputAdornment>
-						),
-					}}
-					variant="standard"
-				/>
+					<TextField
+						onBlur={() => handleFocus('')}
+						onFocus={() => handleFocus('email')}
+						name="email"
+						sx={{ width: 330, marginBottom: 3 }}
+						label="Usuário"
+						value={formik.values.email}
+						onChange={formik.handleChange}
+						helperText={formik.errors.email}
+						error={formik.errors.email !== undefined}
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<AccountCircle
+										color={focused === 'email' ? 'primary' : 'inherit'}
+									/>
+								</InputAdornment>
+							),
+						}}
+						variant="standard"
+					/>
+					<TextField
+						onBlur={() => handleFocus('')}
+						onFocus={() => handleFocus('password')}
+						name="password"
+						type={visible ? 'text' : 'password'}
+						sx={{ width: 330, marginBottom: 3 }}
+						helperText={formik.errors.password}
+						onChange={formik.handleChange}
+						error={formik.errors.password !== undefined}
+						label="Senha"
+						value={formik.values.password}
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<Lock
+										color={focused === 'password' ? 'primary' : 'inherit'}
+									/>
+								</InputAdornment>
+							),
+							endAdornment: (
+								<InputAdornment
+									position="start"
+									onClick={handleView}
+									style={{ cursor: 'pointer' }}
+								>
+									{!visible ? (
+										<VisibilityOff color="error" />
+									) : (
+										<Visibility color="error" />
+									)}
+								</InputAdornment>
+							),
+						}}
+						variant="standard"
+					/>
 
-				<Controls>
-					<CheckArea onClick={handleKeep}>
-						<Checkbox
-							checked={formik.values.keep}
-							style={{ display: 'flex', marginLeft: -10 }}
-						/>
-						<TitleKeep>Manter conectado</TitleKeep>
-					</CheckArea>
+					<Controls>
+						<CheckArea onClick={handleKeep}>
+							<Checkbox
+								checked={formik.values.keep}
+								style={{ display: 'flex', marginLeft: -10 }}
+							/>
+							<TitleKeep>Manter conectado</TitleKeep>
+						</CheckArea>
 
-					<Forgot
-						onClick={(
-							event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-						) => {
-							event.preventDefault();
+						<Forgot
+							onClick={(
+								event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+							) => {
+								event.preventDefault();
+							}}
+						>
+							<ButtonTitle>Esqueci minha senha</ButtonTitle>
+						</Forgot>
+					</Controls>
+
+					<LoadingButton
+						fullWidth
+						sx={{ fontSize: 13 }}
+						loading={loading}
+						variant="contained"
+						loadingPosition="start"
+						startIcon={<Lock />}
+						onClick={() => {
+							formik.handleSubmit();
 						}}
 					>
-						<ButtonTitle>Esqueci minha senha</ButtonTitle>
-					</Forgot>
-				</Controls>
-
-				<LoadingButton
-					fullWidth
-					sx={{ fontSize: 13 }}
-					loading={loading}
-					variant="contained"
-					loadingPosition="start"
-					startIcon={<Lock />}
-					onClick={() => {
-						formik.handleSubmit();
-					}}
-				>
-					Acessar sistema
-				</LoadingButton>
-			</Form>
+						Acessar sistema
+					</LoadingButton>
+				</Form>
+			) : (
+				<>
+					<Loading />
+				</>
+			)}
 		</Container>
 	);
 };

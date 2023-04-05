@@ -32,8 +32,6 @@ import {
 	retrieveCitiesByState,
 	truncate,
 	delay,
-	encryptPassword,
-	dencryptPassword,
 } from 'utils';
 import { Close, NewDocument, Save } from 'icons';
 
@@ -41,8 +39,7 @@ import { useRouter } from 'next/router';
 import { BranchsTable } from 'components/BranchsTable';
 import { BranchModel } from 'Model/BranchModel';
 import { AddressModel } from 'Model/AddressModel';
-import { Loader } from '@googlemaps/js-api-loader';
-import { Map } from 'components/Map';
+import { useCustomContext } from 'context';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -57,7 +54,7 @@ const style = {
 
 const Branch: NextPage = () => {
 	const router = useRouter();
-
+	const { loading, signIn, signed } = useCustomContext();
 	const [id, setId] = React.useState<string>('');
 	const [list, setList] = React.useState<IBranch[]>([]);
 	const [load, setLoad] = React.useState<boolean>(false);
@@ -278,6 +275,9 @@ const Branch: NextPage = () => {
 	};
 
 	React.useEffect(() => {
+		if (!signed && !loading) {
+			router.push('/');
+		}
 		(async () => {
 			try {
 				const all = await BranchModel.all();

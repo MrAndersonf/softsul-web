@@ -29,21 +29,26 @@ import {
 import { Apartment, Eletric, EmailIcon, Finger, Location } from 'icons';
 import { cnpjMask, delay } from 'utils';
 import { CircularProgress } from '@material-ui/core';
+import { useCustomContext } from 'context';
 
 const Profile: NextPage = () => {
 	const router = useRouter();
-	const [loading, setLoading] = React.useState(true);
+	const { signed, loading } = useCustomContext();
+	const [load, setLoad] = React.useState(true);
 	const [branch, setBranch] = React.useState<IBranch | null>(null);
 	const id = router.query.id as string;
 
 	React.useEffect(() => {
+		if (!signed && !loading) {
+			router.push('/');
+		}
 		(async () => {
 			await delay(1000);
 			const profile = await BranchModel.getById(id);
 			if (profile) {
 				setBranch(profile);
 			}
-			setLoading(false);
+			setLoad(false);
 		})();
 	}, [id]);
 
@@ -51,11 +56,11 @@ const Profile: NextPage = () => {
 		<Main>
 			<SideMenu />
 			<Container>
-				{!loading ? (
+				{!load ? (
 					<Grid container direction="column" component={'div'}>
 						<Grid container item direction="row" spacing={1} padding={1}>
 							<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-								{!loading ? (
+								{!load ? (
 									<BranchInfo>
 										<Topic>
 											<TitleArea>
