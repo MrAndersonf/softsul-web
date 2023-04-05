@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Main } from 'components/Main';
 
 import { SideMenu } from 'components/SideMenu';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 import type { NextPage } from 'next';
 import { IBranch } from 'interfaces';
@@ -30,6 +32,8 @@ import { Apartment, Eletric, EmailIcon, Finger, Location } from 'icons';
 import { cnpjMask, delay } from 'utils';
 import { CircularProgress } from '@material-ui/core';
 import { useCustomContext } from 'context';
+import { ArrowBack } from '@mui/icons-material';
+import { PageTag } from 'components/PageTag';
 
 const Profile: NextPage = () => {
 	const router = useRouter();
@@ -60,6 +64,16 @@ const Profile: NextPage = () => {
 					<Grid container direction="column" component={'div'}>
 						<Grid container item direction="row" spacing={1} padding={1}>
 							<Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+								<Fab
+									color="primary"
+									aria-label="add"
+									size="small"
+									onClick={() => router.back()}
+									style={{ marginBottom: 20 }}
+								>
+									<ArrowBack />
+								</Fab>
+								<PageTag label="Dados da Filial" />
 								{!load ? (
 									<BranchInfo>
 										<Topic>

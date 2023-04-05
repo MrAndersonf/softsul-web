@@ -70,9 +70,9 @@ export class AddressModel {
 		this._zipcode = address.zipcode;
 		this._street = address.street;
 		this._number = address.number;
-		this._reference = address.reference;
+		this._reference = address.reference ?? '';
 		this._neighborhood = address.neighborhood;
-		this._complement = address.complement;
+		this._complement = address.complement ?? '';
 		this._city = address.city;
 		this._state = address.state;
 	}
@@ -95,7 +95,8 @@ export class AddressModel {
 			}
 			return null;
 		} catch (error: any) {
-			Snackbar.error(error.message + ' ' + error.response.data.message);
+			Snackbar.error(error.message + ' ' + error.response);
+			return null;
 		}
 	}
 
@@ -113,11 +114,12 @@ export class AddressModel {
 			};
 			const response = await axios.put<IAddress>(`/api/address/${id}`, updated);
 			if (response.status === 200) {
-				return response.data;
+				return response.data as IAddress;
 			}
 			return null;
 		} catch (error: any) {
-			Snackbar.error(error.message + ' ' + error.response.data.message);
+			Snackbar.error(error.message + ' ' + error.response);
+			return null;
 		}
 	}
 
@@ -129,7 +131,7 @@ export class AddressModel {
 			}
 			return null;
 		} catch (error: any) {
-			Snackbar.error(error.message + ' ' + error.response.data.message);
+			Snackbar.error(error.message + ' ' + error.response);
 		}
 	}
 

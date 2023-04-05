@@ -94,6 +94,7 @@ export class BranchModel {
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
+			return null;
 		}
 	}
 
@@ -115,14 +116,15 @@ export class BranchModel {
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
+			return null;
 		}
 	}
 
-	public static async delete(id: string) {
+	public static async delete(id: string[]) {
 		try {
 			const branch = await axios.delete<IBranch>(`/api/branch/${id}`);
 			if (branch.status === 200) {
-				return branch.data;
+				return branch;
 			}
 			return null;
 		} catch (error: any) {

@@ -29,7 +29,6 @@ const create = catchAsyncErrors(
 				long,
 				active,
 			},
-			select: {},
 		});
 		res.status(200).json(address);
 	},
@@ -38,9 +37,11 @@ const create = catchAsyncErrors(
 const deleteId = catchAsyncErrors(
 	async (req: NextApiRequest, res: NextApiResponse) => {
 		const { id } = req.query;
-		await prisma.branch.delete({
+		await prisma.branch.deleteMany({
 			where: {
-				id: id.toString(),
+				id: {
+					in: id,
+				},
 			},
 		});
 

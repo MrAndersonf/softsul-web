@@ -255,18 +255,7 @@ export const BranchsTable = ({
 						)}
 					</>
 				) : (
-					<>
-						<Tooltip title="Filtrar Lista">
-							<IconButton>
-								<FilterList />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title="Adicionar">
-							<IconButton>
-								<Add />
-							</IconButton>
-						</Tooltip>
-					</>
+					<></>
 				)}
 			</Toolbar>
 		);

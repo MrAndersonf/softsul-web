@@ -21,6 +21,7 @@ import {
 	Button,
 	Checkbox,
 	FormControlLabel,
+	CircularProgress,
 } from '@mui/material';
 import {
 	states,
@@ -40,6 +41,8 @@ import { BranchsTable } from 'components/BranchsTable';
 import { BranchModel } from 'Model/BranchModel';
 import { AddressModel } from 'Model/AddressModel';
 import { useCustomContext } from 'context';
+import BranchFilter, { IBranchFilterHandles } from 'components/BranchFilter';
+import { Loading } from 'components/Loading';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -63,6 +66,10 @@ const Branch: NextPage = () => {
 	const [updateBranch, setUpdateBranch] = React.useState<string>('');
 	const [updateAddress, setUpdateAddress] = React.useState<string>('');
 	const [loadingOnSaving, setLoadingOnSaving] = React.useState<boolean>(false);
+
+	const refFilter = React.useRef<IBranchFilterHandles>(
+		null,
+	) as React.MutableRefObject<IBranchFilterHandles>;
 
 	const schema = yup.object().shape({
 		name: yup.string().required('Campo obrigatório'),
@@ -93,7 +100,6 @@ const Branch: NextPage = () => {
 		validateOnBlur: false,
 		validateOnChange: false,
 		initialValues: {
-			status: '',
 			cnpj: '',
 			name: '',
 			street: '',
@@ -132,7 +138,7 @@ const Branch: NextPage = () => {
 					updated = await address.create();
 				}
 
-				if (updated) {
+				if (updated !== null) {
 					const branch = new BranchModel(
 						values.name,
 						values.cnpj,
@@ -145,25 +151,24 @@ const Branch: NextPage = () => {
 
 					if (updateBranch !== '') {
 						const branchUpdated = await branch.update(updateBranch);
-						setList(
-							list.map(e => (e.id === branchUpdated?.id ? branchUpdated : e)),
-						);
+						if (branchUpdated) {
+							Snack.success('Filial atualizada com sucesso!');
+						}
 					} else {
 						const newBranch = await branch.create();
 						if (newBranch) {
-							setList([...list, newBranch]);
+							Snack.success('Filial atualizada com sucesso!');
 						}
 					}
 					setOpen(false);
 					resetForm();
 					setUpdateBranch('');
 					setUpdateAddress('');
-					Snack.success('Operação realizada com sucesso!');
 					setOpen(false);
+					setLoadingOnSaving(false);
 				}
-				setLoadingOnSaving(false);
 			} catch (error: any) {
-				Snack.error('Erro ao executar ' + error.message);
+				Snack.error('Erro ao executar ' + error);
 			}
 		},
 	});
@@ -190,8 +195,16 @@ const Branch: NextPage = () => {
 		setOpen(true);
 	};
 
-	const handleBranchsTableOnDelete = (ids: readonly string[]) => {
-		setList(list.filter(e => !ids.includes(e.id)));
+	const handleBranchsTableOnDelete = async (ids: readonly string[]) => {
+		try {
+			const response = await BranchModel.delete(ids as string[]);
+			if (response?.status === 200) {
+				Snack.success('Operação realizada com sucesso!');
+				setList(list.filter(e => !ids.includes(e.id)));
+			}
+		} catch (error: any) {
+			Snack.error('Erro ao executar ' + error.message);
+		}
 	};
 
 	const handleCNPJ = async () => {
@@ -257,6 +270,10 @@ const Branch: NextPage = () => {
 		setOpen(true);
 	};
 
+	const handleOpenFilter = () => {
+		refFilter.current?.open();
+	};
+
 	const handleChangeState = async (state: string) => {
 		if (state?.length > 2) {
 			const choice = states.filter(el => el?.name === state);
@@ -269,6 +286,10 @@ const Branch: NextPage = () => {
 		setCities(await retrieveCitiesByState(choice[0]?.code));
 	};
 
+	const handleOnFilterBranchs = (branch: IBranch[]) => {
+		setList(branch);
+	};
+
 	const handleCancelCreateOrUpdate = () => {
 		setId('');
 		handleClose();
@@ -278,18 +299,21 @@ const Branch: NextPage = () => {
 		if (!signed && !loading) {
 			router.push('/');
 		}
-		(async () => {
-			try {
-				const all = await BranchModel.all();
+		let prev = sessionStorage.getItem('state');
+		if (prev !== null) {
+			setList(JSON.parse(prev));
+		}
+	}, [signed, loading, router]);
 
-				if (all !== undefined) {
-					setList(all);
-				}
-			} catch (error: any) {
-				Snack.error('Erro ao carregar filiais ' + error.message);
-			}
-		})();
-	}, []);
+	React.useEffect(() => {
+		sessionStorage.setItem('state', JSON.stringify(list));
+	}, [list]);
+
+	if (loading || !signed) {
+		return <Loading />;
+	}
+
+	console.log(formik.values);
 
 	return (
 		<Main>
@@ -300,6 +324,11 @@ const Branch: NextPage = () => {
 						exec: handleOpen,
 						icon: <NewDocument />,
 						name: 'Criar Fornecedor',
+					},
+					{
+						exec: handleOpenFilter,
+						icon: <Search />,
+						name: 'Filtrar Filiais',
 					},
 				]}
 			/>
@@ -495,8 +524,16 @@ const Branch: NextPage = () => {
 												variant="contained"
 												onClick={() => formik.handleSubmit}
 												endIcon={<Save />}
+												loadingIndicator={
+													<CircularProgress
+														size={24}
+														color="inherit"
+														sx={{ color: '##68c601' }}
+													/>
+												}
+												loadingPosition="end"
 											>
-												{id === '' ? 'Cadastrar' : 'Atualizar'}
+												{updateBranch === '' ? 'Cadastrar' : 'Atualizar'}
 											</LoadingButton>
 										</Grid>
 										<Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
@@ -517,6 +554,7 @@ const Branch: NextPage = () => {
 					</div>
 				</div>
 			</Modal>
+			<BranchFilter onFilter={handleOnFilterBranchs} ref={refFilter} />
 		</Main>
 	);
 };
