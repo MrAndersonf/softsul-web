@@ -19,11 +19,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
 import { EOrder } from 'enums';
 
-import { Add, BadgeRounded, Edit, FilterList } from '@mui/icons-material';
-import { IBranch, IUser, IUserShow } from 'interfaces';
-import { cnpjMask, getComparator } from 'utils';
+import { Edit } from '@mui/icons-material';
+import { IUser, IUserShow } from 'interfaces';
+import { getComparator } from 'utils';
 import { useRouter } from 'next/router';
-import { Badge } from '@material-ui/core';
 
 function stableSort<T>(
 	array: readonly T[],
@@ -233,28 +232,11 @@ export const UsersTable = ({
 										<Edit fill="red" />
 									</IconButton>
 								</Tooltip>
-
-								<Tooltip title="Perfil" onClick={handleNavigateToProfile}>
-									<IconButton>
-										<BadgeRounded fill="red" />
-									</IconButton>
-								</Tooltip>
 							</>
 						)}
 					</>
 				) : (
-					<>
-						<Tooltip title="Filtrar Lista">
-							<IconButton>
-								<FilterList />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title="Adicionar">
-							<IconButton>
-								<Add />
-							</IconButton>
-						</Tooltip>
-					</>
+					<></>
 				)}
 			</Toolbar>
 		);

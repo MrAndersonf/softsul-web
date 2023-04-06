@@ -129,6 +129,7 @@ export class BranchModel {
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
+			return null;
 		}
 	}
 

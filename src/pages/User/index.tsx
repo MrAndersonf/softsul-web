@@ -27,6 +27,7 @@ import {
 	InputAdornment,
 	IconButton,
 	FormHelperText,
+	CircularProgress,
 } from '@mui/material';
 import {
 	states,
@@ -50,6 +51,8 @@ import { Map } from 'components/Map';
 import { UsersTable } from 'components/UsersTable';
 import { UserModel } from 'Model/UserModel';
 import { useCustomContext } from 'context';
+import { Loading } from 'components/Loading';
+import UserFilter, { IUserFilterHandles } from 'components/UserFilter';
 
 const style = {
 	position: 'absolute' as 'absolute',
@@ -66,12 +69,14 @@ const User: NextPage = () => {
 	const router = useRouter();
 	const { signed, loading } = useCustomContext();
 	const [list, setList] = React.useState<IUser[]>([]);
-	const [load, setLoad] = React.useState<boolean>(false);
 	const [open, setOpen] = React.useState(false);
 	const [updateUser, setUpdateUser] = React.useState<string>('');
 	const [showPassword, setShowPassword] = React.useState(false);
-
 	const [loadingOnSaving, setLoadingOnSaving] = React.useState<boolean>(false);
+
+	const refUser = React.useRef<IUserFilterHandles>(
+		null,
+	) as React.MutableRefObject<IUserFilterHandles>;
 
 	const schema = yup.object().shape({
 		name: yup.string().required('Campo obrigatório'),
@@ -137,6 +142,10 @@ const User: NextPage = () => {
 		},
 	});
 
+	const handleOpenFilter = () => {
+		refUser.current?.open();
+	};
+
 	const handleClickShowPassword = () => setShowPassword(show => !show);
 
 	const handleMouseDownPassword = (
@@ -145,17 +154,25 @@ const User: NextPage = () => {
 		event.preventDefault();
 	};
 
-	const handleBranchsTableOnEdit = async (id: string) => {
+	const handleUserTableOnEdit = async (id: string) => {
 		const [supplier] = list.filter(e => e.id === id);
 		formik.setFieldValue('name', supplier?.name);
-		formik.setFieldValue('email', supplier?.email);
 		formik?.setFieldValue('active', supplier?.active);
-		formik?.setFieldValue('password', supplier?.password);
+		formik?.setFieldValue('email', supplier?.email);
+		setUpdateUser(id);
 		setOpen(true);
 	};
 
-	const handleBranchsTableOnDelete = (ids: readonly string[]) => {
-		setList(list.filter(e => !ids.includes(e.id)));
+	const handleBranchsTableOnDelete = async (ids: readonly string[]) => {
+		try {
+			const response = await UserModel.delete(ids as string[]);
+			if (response?.status === 200) {
+				Snack.success('Operação realizada com sucesso!');
+				setList(list.filter(e => !ids.includes(e.id)));
+			}
+		} catch (error: any) {
+			Snack.error('Erro ao executar ' + error.message);
+		}
 	};
 
 	const handleChange = async (field: string, value: string | number) => {
@@ -181,17 +198,11 @@ const User: NextPage = () => {
 		if (!signed && !loading) {
 			router.push('/login');
 		}
-		(async () => {
-			try {
-				const all = await UserModel.all();
-				if (all !== null) {
-					setList(all);
-				}
-			} catch (error: any) {
-				Snack.error('Erro ao carregar usuários ' + error.message);
-			}
-		})();
-	}, []);
+	}, [signed, loading, router]);
+
+	if (!signed || loading) {
+		return <Loading />;
+	}
 
 	return (
 		<Main>
@@ -203,12 +214,17 @@ const User: NextPage = () => {
 						icon: <NewDocument />,
 						name: 'Criar usuário',
 					},
+					{
+						exec: handleOpenFilter,
+						icon: <Search />,
+						name: 'Filtar Usuários',
+					},
 				]}
 			/>
 
 			<UsersTable
 				data={list}
-				onEdit={handleBranchsTableOnEdit}
+				onEdit={handleUserTableOnEdit}
 				label="Usuários"
 				onDelete={handleBranchsTableOnDelete}
 			/>
@@ -336,6 +352,14 @@ const User: NextPage = () => {
 												variant="contained"
 												onClick={() => formik.handleSubmit}
 												endIcon={<Save />}
+												loadingPosition="end"
+												loadingIndicator={
+													<CircularProgress
+														size={24}
+														color="inherit"
+														sx={{ color: '##68c601' }}
+													/>
+												}
 											>
 												{updateUser === '' ? 'Cadastrar' : 'Atualizar'}
 											</LoadingButton>
@@ -358,6 +382,7 @@ const User: NextPage = () => {
 					</div>
 				</div>
 			</Modal>
+			<UserFilter ref={refUser} onFilter={setList} />
 		</Main>
 	);
 };

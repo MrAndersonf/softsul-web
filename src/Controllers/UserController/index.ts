@@ -33,15 +33,16 @@ const create = catchAsyncErrors(
 const deleteId = catchAsyncErrors(
 	async (req: NextApiRequest, res: NextApiResponse) => {
 		const { id } = req.query;
-		await prisma.user.delete({
+		await prisma.user.deleteMany({
 			where: {
-				id: id.toString(),
+				id: {
+					in: id,
+				},
 			},
 		});
 
 		res.status(200).json({
 			status: 'success',
-			data: null,
 		});
 	},
 );

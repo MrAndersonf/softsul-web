@@ -79,16 +79,16 @@ export class UserModel {
 		}
 	}
 
-	public static async delete(id: string) {
+	public static async delete(id: string[]) {
 		try {
 			const user = await axios.delete<IUser>(`/api/user/${id}`);
 			if (user.status === 200) {
-				return user.data;
+				return user;
 			}
 			return null;
 		} catch (error: any) {
 			Snackbar.error(error.message + ' ' + error.response.data.message);
-			return false;
+			return null;
 		}
 	}
 

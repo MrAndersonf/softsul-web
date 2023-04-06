@@ -44,17 +44,6 @@ import { useCustomContext } from 'context';
 import BranchFilter, { IBranchFilterHandles } from 'components/BranchFilter';
 import { Loading } from 'components/Loading';
 
-const style = {
-	position: 'absolute' as 'absolute',
-	top: '50%',
-	left: '50%',
-	transform: 'translate(-50%, -50%)',
-	margin: 0,
-	padding: 0,
-	minWidth: 330,
-	maxWidth: 700,
-};
-
 const Branch: NextPage = () => {
 	const router = useRouter();
 	const { loading, signIn, signed } = useCustomContext();

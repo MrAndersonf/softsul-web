@@ -1,39 +1,31 @@
-import React, { useState } from 'react';
-
-import { Main } from 'components/Main';
-
-import { SideMenu } from 'components/SideMenu';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-
-import type { NextPage } from 'next';
+import React from 'react';
 import { IBranch } from 'interfaces';
-
+import type { NextPage } from 'next';
 import { Grid } from '@mui/material';
-
-import { useRouter } from 'next/router';
-
-import { BranchModel } from 'Model/BranchModel';
-
-import { Map } from 'components/Map';
-import {
-	BranchInfo,
-	Container,
-	Desc,
-	LoadArea,
-	LoadMain,
-	LoadMessage,
-	Status,
-	Title,
-	TitleArea,
-	Topic,
-} from 'styles/Profile/style';
-import { Apartment, Eletric, EmailIcon, Finger, Location } from 'icons';
+import Fab from '@mui/material/Fab';
 import { cnpjMask, delay } from 'utils';
-import { CircularProgress } from '@material-ui/core';
+import { Map } from 'components/Map';
+import { useRouter } from 'next/router';
+import { Main } from 'components/Main';
 import { useCustomContext } from 'context';
-import { ArrowBack } from '@mui/icons-material';
 import { PageTag } from 'components/PageTag';
+import { ArrowBack } from '@mui/icons-material';
+import { SideMenu } from 'components/SideMenu';
+import { BranchModel } from 'Model/BranchModel';
+import { CircularProgress } from '@material-ui/core';
+import { Apartment, Eletric, EmailIcon, Finger, Location } from 'icons';
+import {
+	Title,
+	Desc,
+	Topic,
+	Status,
+	TitleArea,
+	LoadMain,
+	LoadArea,
+	Container,
+	BranchInfo,
+	LoadMessage,
+} from 'styles/Profile/style';
 
 const Profile: NextPage = () => {
 	const router = useRouter();
@@ -122,7 +114,7 @@ const Profile: NextPage = () => {
 							</Grid>
 
 							<Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-								<Map lat={branch?.lat} lng={branch?.long} />
+								<Map lat={branch?.lat} lng={branch?.long} company={branch?.name} />
 							</Grid>
 						</Grid>
 					</Grid>
