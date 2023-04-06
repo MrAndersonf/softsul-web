@@ -137,7 +137,7 @@ export class AddressModel {
 
 	public static async all() {
 		try {
-			const response = await axios<IAddress[]>('/api/address');
+			const response = await axios.get<IAddress[]>('/api/address');
 			if (response.status === 200) {
 				return response.data;
 			}
@@ -149,7 +149,7 @@ export class AddressModel {
 
 	public static async getById(id: string) {
 		try {
-			const response = await axios<IAddress>(`/api/branch/${id}`);
+			const response = await axios.get<IAddress>(`/api/branch/${id}`);
 			if (response.status === 200) {
 				return response.data;
 			}

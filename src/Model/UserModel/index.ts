@@ -94,7 +94,7 @@ export class UserModel {
 
 	public static async all() {
 		try {
-			const users = await axios<IUser[]>('/api/user');
+			const users = await axios.get<IUser[]>('/api/user');
 			if (users.status === 200) {
 				return users.data;
 			}
@@ -107,7 +107,7 @@ export class UserModel {
 
 	public static async getById(id: string) {
 		try {
-			const user = await axios<IUser>(`/api/user/${id}`);
+			const user = await axios.get<IUser>(`/api/user/${id}`);
 			if (user.status === 200) {
 				return user.data;
 			}

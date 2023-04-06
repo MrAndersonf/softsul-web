@@ -1,5 +1,6 @@
 import React from 'react';
 import * as yup from 'yup';
+import { IUser } from 'interfaces';
 import { useFormik } from 'formik';
 import type { NextPage } from 'next';
 import Snack from 'components/Snack';
@@ -7,12 +8,18 @@ import { Main } from 'components/Main';
 import { Form } from 'components/Form';
 import { LoadingButton } from '@mui/lab';
 import { Speed } from 'components/Speed';
-import { Search, Visibility, VisibilityOff } from '@mui/icons-material';
-import { IAddress, IBranch, IUser } from 'interfaces';
-import { Selecter } from 'components/Selecter';
 import { PageTag } from 'components/PageTag';
 import { TextInput } from 'components/TextInput';
 import { SideMenu } from 'components/SideMenu';
+import { Search, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Close, NewDocument, Save } from 'icons';
+
+import { useRouter } from 'next/router';
+import { UsersTable } from 'components/UsersTable';
+import { UserModel } from 'Model/UserModel';
+import { useCustomContext } from 'context';
+import { Loading } from 'components/Loading';
+import UserFilter, { IUserFilterHandles } from 'components/UserFilter';
 
 import {
 	Grid,
@@ -20,39 +27,15 @@ import {
 	Modal,
 	Button,
 	Checkbox,
-	FormControlLabel,
-	FormControl,
 	InputLabel,
-	OutlinedInput,
-	InputAdornment,
 	IconButton,
+	FormControl,
+	OutlinedInput,
 	FormHelperText,
+	InputAdornment,
 	CircularProgress,
+	FormControlLabel,
 } from '@mui/material';
-import {
-	states,
-	sanitize,
-	getCNPJ,
-	cnpjMask,
-	cepRegex,
-	cnpjRegex,
-	retrieveCitiesByState,
-	truncate,
-	delay,
-} from 'utils';
-import { Close, NewDocument, Save } from 'icons';
-
-import { useRouter } from 'next/router';
-import { BranchsTable } from 'components/BranchsTable';
-import { BranchModel } from 'Model/BranchModel';
-import { AddressModel } from 'Model/AddressModel';
-import { Loader } from '@googlemaps/js-api-loader';
-import { Map } from 'components/Map';
-import { UsersTable } from 'components/UsersTable';
-import { UserModel } from 'Model/UserModel';
-import { useCustomContext } from 'context';
-import { Loading } from 'components/Loading';
-import UserFilter, { IUserFilterHandles } from 'components/UserFilter';
 
 const style = {
 	position: 'absolute' as 'absolute',

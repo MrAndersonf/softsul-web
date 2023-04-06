@@ -10,7 +10,6 @@ import { Close, SearchIcon } from 'icons';
 import { Form } from 'components/Form';
 import { LoadingButton } from '@mui/lab';
 
-import { Selecter } from 'components/Selecter';
 import { PageTag } from 'components/PageTag';
 import { CircularProgress } from '@mui/material';
 import { TextInput } from 'components/TextInput';
@@ -23,13 +22,7 @@ import {
 	Checkbox,
 	FormControlLabel,
 } from '@mui/material';
-import {
-	states,
-	delay,
-	sanitize,
-	cnpjMask,
-	retrieveCitiesByState,
-} from 'utils';
+import { states, delay, retrieveCitiesByState } from 'utils';
 
 export interface IUserFilter {
 	onFilter: (filter: IUser[]) => void;
@@ -40,12 +33,11 @@ export interface IUserFilterHandles {
 	close: () => void;
 }
 
-const BranchFilter: React.ForwardRefRenderFunction<
+const UserFilter: React.ForwardRefRenderFunction<
 	IUserFilterHandles,
 	IUserFilter
 > = ({ onFilter }: IUserFilter, ref) => {
 	const [open, setOpen] = React.useState(false);
-	const [cities, setCities] = React.useState<any[]>([]);
 
 	const [loadingOnSearch, setLoadingOnSearch] = React.useState<boolean>(false);
 
@@ -91,10 +83,6 @@ const BranchFilter: React.ForwardRefRenderFunction<
 	});
 
 	const handleChange = async (field: string, value: string | number) => {
-		if (field === 'state') {
-			await handleChangeState(String(value));
-			return;
-		}
 		formik.setFieldValue(field, value);
 	};
 
@@ -105,18 +93,6 @@ const BranchFilter: React.ForwardRefRenderFunction<
 
 	const handleOpen = () => {
 		setOpen(true);
-	};
-
-	const handleChangeState = async (state: string) => {
-		if (state?.length > 2) {
-			const choice = states.filter(el => el?.name === state);
-			formik.setFieldValue('state', choice[0]?.name);
-			setCities(await retrieveCitiesByState(choice[0]?.code));
-			return;
-		}
-		const choice = states.filter(el => el.short === state);
-		formik.setFieldValue('state', choice[0]?.name);
-		setCities(await retrieveCitiesByState(choice[0]?.code));
 	};
 
 	const handleCancelCreateOrUpdate = () => {
@@ -255,4 +231,4 @@ const BranchFilter: React.ForwardRefRenderFunction<
 	);
 };
 
-export default React.forwardRef(BranchFilter);
+export default React.forwardRef(UserFilter);

@@ -135,7 +135,7 @@ export class BranchModel {
 
 	public static async all() {
 		try {
-			const branches = await axios<IBranch[]>('/api/branch');
+			const branches = await axios.get<IBranch[]>('/api/branch');
 			if (branches.status === 200) {
 				return branches.data;
 			}
@@ -147,7 +147,7 @@ export class BranchModel {
 
 	public static async getById(id: string) {
 		try {
-			const branch = await axios<IBranch>(`/api/branch/${id}`);
+			const branch = await axios.get<IBranch>(`/api/branch/${id}`);
 			if (branch.status === 200) {
 				return branch.data;
 			}
