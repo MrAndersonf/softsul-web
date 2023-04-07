@@ -312,7 +312,7 @@ const Branch: NextPage = () => {
 					{
 						exec: handleOpen,
 						icon: <NewDocument />,
-						name: 'Criar Fornecedor',
+						name: 'Criar Filial',
 					},
 					{
 						exec: handleOpenFilter,

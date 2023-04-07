@@ -36,8 +36,13 @@ export default async function handler(
 			},
 		});
 		if (data) {
-			return res.status(200).json(data);
+			return res.status(200).json(
+				data.map(user => {
+					return { ...user, password: '' };
+				}),
+			);
 		}
+
 		return res.status(401).json({ status: 'error' });
 	} catch (error: any) {
 		res.status(500).json({ error: error.message });
